@@ -93,19 +93,17 @@ Shader "FishManShaderTutorial/CloudSea"{
 				fixed2 uv = vfi.uv;
 			    fixed3 col = fixed3(0.0,0.0,0.0);
 			    float num = 0.;
-				//return fixed4(uv.y,0.,0.,1.0);
 			    for (float i=1.; i < LAYER; i++) {
 			    	float wave = 2.*Wave(i,uv,1.)+Wave(i,uv,1.8)+.5*Wave(i,uv,3.);
 			    	float layerVal = 0.7-0.03*i + wave;
-			        if(uv.y <layerVal){
-			        	col = i*fixed3(0,.03,1);//计算每一层的基本颜色
-			            num = i;//计算所在层的ID
+			        if(uv.y >layerVal){
+			            break;
 			        }
+					num = i;//计算所在层的ID
 			    }
-			    num = LAYER - num;
-			    col += num * fixed3(.04,.04,.04);//颜色叠亮
-				//return fixed4(sun+sunCircle,0.,0.,1.0);
-				if(num ==LAYER){
+			    col = num*fixed3(0,.03,1);//计算每一层的基本颜色
+			    col += (LAYER - num) * fixed3(.04,.04,.04);//颜色叠亮
+				if(num ==0){
 					//添加海平面泛光
 					float ry = Remap(0.7,1.0,1.0,0.0,uv.y);
 					col = lerp(fixed3(0.1,0.6,0.9),fixed3(0.1,0.7,0.9),ry);
