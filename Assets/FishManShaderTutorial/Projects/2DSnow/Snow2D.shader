@@ -1,5 +1,5 @@
 
-Shader "FishManShaderTutorial/Snow2D"{
+Shader "FishManShaderTutorial/Snow2D - tutourial"{
 	Properties{
 	    _MainTex ("MainTex", 2D) = "white" {}
         _NoiseTex ("_NoiseTex", 2D) = "white" {}
@@ -88,50 +88,46 @@ Shader "FishManShaderTutorial/Snow2D"{
 
 
 
-#define LIGHT_SNOW // Comment this out for a blizzard
 
-#ifdef LIGHT_SNOW
-	#define LAYERS 20
-	#define DEPTH .5
-	#define WIDTH .5
-	#define SPEED .6
-#else // BLIZZARD
-	#define LAYERS 200
-	#define DEPTH .1
-	#define WIDTH .8
-	#define SPEED 1.5
-#endif
-			fixed2 rand(fixed2 co){
-				fixed x = frac(sin(dot(co.xy ,fixed2(12.9898,78.233))) * 43758.5453);
-				fixed y = frac(sin(dot(co.xy ,fixed2(47.6537,37.2793))) * 37573.5913);
+			#define SIZE_RATE 0.1
+			#define YSPEED 0.5
+			#define XSPEED 0.2
+			#define LAYERS 10
+			float Rand11(float x){
+				return frac(sin(x*157.1147) * 43751.1353);
+			}
+			fixed2 Rand22(fixed2 co){
+				fixed x = frac(sin(dot(co.xy ,fixed2(1232.9898,7183.233))) * 43758.5453);
+				fixed y = frac(sin(dot(co.xy ,fixed2(4577.6537,5337.2793))) * 37573.5913);
 				return fixed2(x,y);
 			}
-
-			fixed4 ProcessFrag(v2f input)  {
-				fixed2 uv = input.uv;
-				fixed3 acc = fixed3(0.0,0.0,0.0);
-				fixed dof = 5.*sin(_Time.y*.1);//让雪花的大小变化
-				//不同的layer  生成不同的雪花
+			float3 SnowSingleLayer(float2 uv,float layer){
+				float time = _Time.y;
+				fixed3 acc = fixed3(0.0,0.0,0.0);//让雪花的大小变化
+				uv = uv * (2.0+layer);//透视视野变大效果
+			    float xOffset = uv.y * (((Rand11(layer)*2-1.)*0.5+1.)*XSPEED);//增加x轴移动
+			    float yOffset = (YSPEED*time);//y轴下落过程
+				uv += fixed2(xOffset,yOffset);
+				float2 rgrid = Rand22(floor(uv)+(31.1759*layer));
+				uv = frac(uv);
+				uv -= (rgrid*2-1.0) * 0.35;
+				uv -=0.5;
+				float r = length(uv);
+				float circleSize = 0.05*(1.0+0.3*sin(time*SIZE_RATE));//让大小变化点
+				float val = smoothstep(circleSize,-circleSize,r);
+				float3 col = float3(val,val,val)* rgrid.x ;
+				return col;
+			}
+			float3 Snow(float2 uv){
+				float3 acc = float3(0,0,0);
 				for (fixed i=0.;i<LAYERS;i++) {
-					fixed fi = fixed(i); 
-					fixed2 q = uv*(1.+fi*DEPTH);//划分不同的格子
-					q += fixed2(q.y*(WIDTH*frac(fi*9.27373)-WIDTH*.5),//添加左右偏移
-					SPEED*_Time.y/(1.+fi*DEPTH*.03));//添加随着时间向下漂移的效果
-					// 随机值生成
-					fixed2 r = rand(floor(q)+(31.1759*fi));
-    				//acc = r;
-					fixed2 s = abs(frac(q)-.5+.9*r.xy-.45);//-0.5~0.5  + -0.5~0  -1~0.5
-					//s += .01*abs(2.*frac(10.*q.yx)-1.); 
-					fixed d = length(s);// .6*max(s.x-s.y,s.x+s.y)+max(s.x,s.y)-.01;
-					//acc += fixed3(d,d,d);
-					fixed edge = .005+.05*min(.5*abs(fi-5.-dof),1.);//随机边距 生成不同的圆
-					fixed value = r.x/(1.+.02*fi*DEPTH);  //.02*fi*DEPTH  随着距离增加变暗
-					fixed finVal = smoothstep(edge,-edge,d)* value;
-					acc += fixed3(finVal,finVal,finVal);
+					acc += SnowSingleLayer(uv,i); 
 				}
-                return fixed4(acc, 1.0);
+				return acc;
+			}
+			fixed4 ProcessFrag(v2f input)  {
+				return float4(Snow(input.uv),1.0);
             }
-
 
 			fixed4 frag(v2f i) : SV_Target{
 				float linearDepth = LinearEyeDepth(SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, i.uv_depth));
