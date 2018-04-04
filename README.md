@@ -33,7 +33,6 @@
 
 
 <img src="https://jiepengtan.github.io/assets/img/blog/ShaderTutorial2D/Snow/snow.gif" width="256"> <img src="https://jiepengtan.github.io/assets/img/blog/ShaderTutorial3D/GameHPUI/game_hp_ui.gif" width="256">
-<img src="https://jiepengtan.github.io/assets/img/blog/ShaderTutorial2D/Sea/sea.gif" width="256"> <img src="https://jiepengtan.github.io/assets/img/blog/ShaderTutorial2D/FireParticle/fire_particle.gif" width="256">
-
+<img src="https://jiepengtan.github.io/assets/img/blog/ShaderTutorial2D/Sea/sea.gif" width="256"> <img src="https://jiepengtan.github.io/assets/img/blog/ShaderTutorial2D/FireParticle/fire_particle.gif" width="256"> <img src="http://127.0.0.1:4000/assets/img/blog/ShaderTutorial2D/Rain/RainBase.gif" width="256">
 
   [1]: https://jiepengtan.github.io/
