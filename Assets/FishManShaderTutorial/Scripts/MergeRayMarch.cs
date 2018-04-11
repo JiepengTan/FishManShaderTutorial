@@ -2,7 +2,7 @@
 using System.Collections;
 
 [ExecuteInEditMode]
-public class MergeUnityWithShadertoy : PostEffectsBase {
+public class MergeRayMarch : PostEffectsBase {
 
 	public Shader shader;
 	private Material _mat = null;
@@ -41,13 +41,13 @@ public class MergeUnityWithShadertoy : PostEffectsBase {
     void OnEnable() {
 		camera.depthTextureMode |= DepthTextureMode.Depth;
 	}
-	
-	void OnRenderImage (RenderTexture src, RenderTexture dest) {
+
+    [ImageEffectOpaque]
+    void OnRenderImage (RenderTexture src, RenderTexture dest) {
 		if (material != null) {
             SetRay();
             material.SetTexture("_NoiseTex", _NoiseTex);
             material.SetVector("_LoopNum", _LoopNum);
-            
             Graphics.Blit(src, dest, material);
         } else {
 			Graphics.Blit(src, dest);
