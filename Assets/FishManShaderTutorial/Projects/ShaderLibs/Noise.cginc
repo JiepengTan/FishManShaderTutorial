@@ -329,6 +329,37 @@ float wnoise(float2 p,float time) {
 	}
 	return md;
 }
+//3D version please ref to https://www.shadertoy.com/view/ldl3Dl
+float3 wnoise( in float3 x ,float time)
+{
+    float3 p = floor( x );
+    float3 f = frac( x );
+
+    float id = 0.0;
+    float2 res = float2( 100.0,100.0 );
+    for( int k=-1; k<=1; k++ )
+    for( int j=-1; j<=1; j++ )
+    for( int i=-1; i<=1; i++ )
+    {
+        float3 b = float3( float(i), float(j), float(k) );
+		float3 o = hash33( p + b );
+		o = 0.5+0.5*sin(time+6.28*o);
+        float3 r = float3( b ) - f + o;
+        float d = dot( r, r );
+
+        if( d < res.x )
+        {
+            id = dot( p+b, float3(1.0,57.0,113.0 ) );
+            res = float2( d, res.x );         
+        }
+        else if( d < res.y )
+        {
+            res.y = d;
+        }
+    }
+
+    return float3( sqrt( res ), abs(id) );
+}
 
 const float2x2 m2 = float2x2( 0.80,  0.60, -0.60,  0.80 );
 float fbm( float2 p )
