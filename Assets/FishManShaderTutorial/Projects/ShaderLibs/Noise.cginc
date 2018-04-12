@@ -1,7 +1,7 @@
 // Merge by JiepengTan@gmail.com
 
 //https://www.shadertoy.com/view/4ssXRX   一些指定分布的Hash
-//https://www.shadertoy.com/view/4djSRW  不实用三角函数实现的Hash
+//https://www.shadertoy.com/view/4djSRW  不使用三角函数实现的Hash
 #define ITERATIONS 4
 // *** Change these to suit your range of random numbers..
 // *** Use this for integer stepped ranges, ie Value-Noise/Perlin noise functions.
@@ -306,6 +306,28 @@ float tnoise(in float3 p, float time,float spd)
         bp += 0.14;
 	}
 	return rz;
+}
+
+//voronoi worleynoise
+float wnoise(float2 p,float time) {
+	float2 n = floor(p);
+	float2 f = frac(p);
+	float md = 5.0;
+	float2 m = float2(0.,0.);
+	for (int i = -1;i<=1;i++) {
+		for (int j = -1;j<=1;j++) {
+			float2 g = float2(i, j);
+			float2 o = hash22(n+g);
+			o = 0.5+0.5*sin(time+6.28*o);
+			float2 r = g + o - f;
+			float d = dot(r, r);
+			if (d<md) {
+				md = d;
+				m = n+g+o;
+			}
+		}
+	}
+	return md;
 }
 
 const float2x2 m2 = float2x2( 0.80,  0.60, -0.60,  0.80 );
