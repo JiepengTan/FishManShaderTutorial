@@ -1,5 +1,6 @@
 // Motion vector shader for Skinner Particle
 #include "UnityCG.cginc"
+#include "Noise.cginc"
 sampler2D _MainTex;
 float2 _MainTex_TexelSize;
 float4x4 _FrustumCornersRay;
@@ -47,7 +48,7 @@ v2f VertMergeRayMarch(appdata_img v) {
 }
 
 
-//fixed4 ProcessRayMarch(float2 uv,float3 ro,float3 rd,inout float sceneDep,float4 sceneCol);
+fixed4 ProcessRayMarch(float2 uv,float3 ro,float3 rd,inout float sceneDep,float4 sceneCol);
 fixed4 FragMergeRayMarch(v2f i) : SV_Target{
 	float depth = LinearEyeDepth(SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, i.uv_depth));
 	depth *= length(i.interpolatedRay.xyz);

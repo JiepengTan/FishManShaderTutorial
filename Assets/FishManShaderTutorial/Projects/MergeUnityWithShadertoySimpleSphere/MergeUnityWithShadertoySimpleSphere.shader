@@ -6,6 +6,10 @@
 		Pass {
 			ZTest Always Cull Off ZWrite Off
 			CGPROGRAM
+
+#pragma vertex VertMergeRayMarch  
+#pragma fragment FragMergeRayMarch  
+#include "../ShaderLibs/MergeRayMarch.cginc"
 			fixed sphIntersect(in fixed3 ro, in fixed3 rd, in fixed4 sph)
 			{
 				fixed3 oc = sph.xyz - ro;
@@ -22,9 +26,9 @@
 			fixed4 ProcessRayMarch(float2 uv,float3 ro,float3 rd,inout float sceneDep,float4 sceneCol)  {
 				fixed4 sph = fixed4(0.0,0.0,0.0, 0.5);
 				fixed3 col = fixed3(0.0,0.0,0.0); 
-				fixed t = sphIntersect(ro, rd, sph); 
-				if (t > 0.0 && t < sceneDep)
-				{
+				fixed t = sphIntersect(ro + float3(0.,tnoise(_Time.xy*10.,_Time.y,1.),0.), rd, sph);   
+				if (t > 0.0 && t < sceneDep)  
+				{    
 					float3 pos = ro + t * rd;
 					float3 nor = normalize(pos - sph.xyz);
 					fixed3 col = fixed3(1.2,1.2,1.2);
@@ -33,9 +37,6 @@
 				}
 				return sceneCol;
 			} 
-#pragma vertex VertMergeRayMarch  
-#pragma fragment FragMergeRayMarch  
-#include "../ShaderLibs/MergeRayMarch.cginc"
 			ENDCG
 		}//end pass
 	}//end SubShader
