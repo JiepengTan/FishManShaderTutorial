@@ -324,7 +324,7 @@ float wnoise(float2 p,float time) {
 			if (d<md) {
 				md = d;
 				m = n+g+o;
-			}
+			} 
 		}
 	}
 	return md;
