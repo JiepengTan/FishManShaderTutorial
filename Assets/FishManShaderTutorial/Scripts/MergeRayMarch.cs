@@ -3,16 +3,10 @@ using System.Collections;
 
 [ExecuteInEditMode]
 public class MergeRayMarch : PostEffectsBase {
-
-	public Shader shader;
+	//public Shader shader;
 	private Material _mat = null;
 
-	public Material material {  
-		get {
-			_mat = CheckShaderAndCreateMaterial(shader, _mat);
-			return _mat;
-		}  
-	}
+    public Material material;
 
 	private Camera myCamera;
 	public new Camera camera {
