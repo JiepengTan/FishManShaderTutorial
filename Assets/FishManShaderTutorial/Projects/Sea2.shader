@@ -1,35 +1,79 @@
-Shader "FishManShaderTutorial/Sea" {
+// create by JiepengTan  email: jiepengtan@gmail.com
+// 2018-04-13
+
+
+
+Shader "FishManShaderTutorial/Sea2" {
     Properties{
         _MainTex("Base (RGB)", 2D) = "white" {}
+        _NoiseTex("_NoiseTex", 2D) = "white" {}
 		//_LooPNUMS ("_LooPNUMS", Vector) = (3.,5.,8., 1)
+		SEA_HEIGHT ("SEA_HEIGHT", float) = 0.6// color
+		SEA_CHOPPY ("SEA_CHOPPY", float) = 4.0 // color
+		SEA_SPEED ("SEA_SPEED", float) = 0.8 // color
+		SEA_FREQ ("SEA_FREQ", float) = 0.16 // color
+		SEA_BASE ("_SeaBaseColor", Color) = (0.1,0.19,0.22, 1) // color
+		SEA_WATER_COLOR ("_SeaWaterColor", Color) = (0.8,0.9,0.6) // color
+
+		MAP_LOOP_NUM ("MAP_LOOP_NUM", float) = 3 // color
+		MAPH_LOOP_NUM ("MAPH_LOOP_NUM", float) = 5 // color
+		RAY_MARCH_LOOP_NUM ("RAY_MARCH_LOOP_NUM", float) = 30 // color
+
     }
     SubShader{
         Pass {
             ZTest Always Cull Off ZWrite Off
             CGPROGRAM
-			const float PI	 	= 3.141592;
-			const float EPSILON	= 1e-3;
-			#define EPSILON_NRM (0.1 / _ScreenParams.x)
-
-			// sea
-			const int ITER_GEOMETRY = 3;
-			const int ITER_FRAGMENT = 5;
-			const float SEA_HEIGHT = 0.6;
-			const float SEA_CHOPPY = 4.0;
-			const float SEA_SPEED = 0.8;
-			const float SEA_FREQ = 0.16;
-			const float3 SEA_BASE = float3(0.1,0.19,0.22);
-			const float3 SEA_WATER_COLOR = float3(0.8,0.9,0.6);
-			#define SEA_TIME (1.0 + _Time.y * SEA_SPEED)
-			const float2x2 octave_m = float2x2(1.6,1.2,-1.2,1.6);
-
-
             float4 _LooPNUMS = float4(3.,5.,25., 1);
 #pragma vertex VertMergeRayMarch  
 #pragma fragment FragMergeRayMarch  
 #include "ShaderLibs/MergeRayMarch.cginc"
-            // value noise, and its analytical derivatives
-    	        
+
+			const int NUM_STEPS = 8;
+			const float EPSILON = 1e-3;
+
+			float SEA_HEIGHT = 0.6;
+			float SEA_CHOPPY = 4.0;
+			float SEA_SPEED = 0.8;
+			float SEA_FREQ = 0.16;
+			float3 SEA_BASE = float3(0.1,0.19,0.22);
+			float3 SEA_WATER_COLOR = float3(0.8,0.9,0.6);
+			sampler2D _NoiseTex;
+// 是否使用Noise 贴图来加速
+//#define TEXTURE_NOISE 1
+//#define TEXTURE_SMOOTH_NOISE 1
+
+#define EPSILON_NRM (0.1 / _ScreenParams.x)
+#define SEA_TIME (1.0 + _Time.y * SEA_SPEED)
+
+			float MAP_LOOP_NUM = 3;
+			float MAPH_LOOP_NUM = 5;
+			float RAY_MARCH_LOOP_NUM = 30;
+
+			float hash( float2 p ) {
+				float h = dot(p,float2(127.1,311.7)); 
+				return frac(sin(h)*43758.5453123);
+			}
+			float noise22( in float2 p ) {
+			#if TEXTURE_NOISE 
+				return tex2Dlod(_NoiseTex,float4(p*0.1,0.,0.)).r*2-1.0;
+			#elif TEXTURE_SMOOTH_NOISE 
+				float2 _p = floor(p);
+				float2 f = frac(p);
+				float2 uv = _p.xy + f.xy*f.xy*(3.0-2.0*f.xy);
+				return tex2Dlod( _NoiseTex, float4((uv+118.4)/256.0, 0., 0.) ).x * 30.0;
+		    #else
+				float2 i = floor( p );
+				float2 f = frac( p );    
+				float2 u = f*f*(3.0-2.0*f);
+				return -1.0+2.0*lerp( lerp( hash( i + float2(0.0,0.0) ), 
+								 hash( i + float2(1.0,0.0) ), u.x),
+							lerp( hash( i + float2(0.0,1.0) ), 
+								 hash( i + float2(1.0,1.0) ), u.x), u.y);
+			#endif
+
+			}
+
 			// lighting
 			float diffuse(float3 n,float3 l,float p) {
 				return pow(dot(n,l) * 0.4 + 0.6,p);
@@ -47,7 +91,7 @@ Shader "FishManShaderTutorial/Sea" {
 
 			// sea
 			float sea_octave(float2 uv, float choppy) {
-				uv += noise(uv);        
+				uv += noise22(uv);        
 				float2 wv = 1.0-abs(sin(uv));
 				float2 swv = abs(cos(uv));    
 				wv = lerp(wv,swv,wv);
@@ -55,34 +99,36 @@ Shader "FishManShaderTutorial/Sea" {
 			}
 
 			float map(float3 p) {
+				float2x2 octave_m = float2x2(1.6,1.2,-1.2,1.6);
 				float freq = SEA_FREQ;
 				float amp = SEA_HEIGHT;
 				float choppy = SEA_CHOPPY;
 				float2 uv = p.xz; uv.x *= 0.75;
     
-				float d, h = 0.0;   
-				for(int i = 0; i < _LooPNUMS.x; i++) {        
-    				d = sea_octave((uv+SEA_TIME)*freq,choppy);
-    				d += sea_octave((uv-SEA_TIME)*freq,choppy);
+				float d, h = 0.0; 
+				for(int i = 0; i < MAP_LOOP_NUM; i++) {        
+					d = sea_octave((uv + SEA_TIME)*freq,choppy);
+					d += sea_octave((uv - SEA_TIME)*freq,choppy);
 					h += d * amp;        
-    				uv = mul(octave_m,uv); freq *= 1.9; amp *= 0.22;
+					uv = mul(octave_m,uv); freq *= 1.9; amp *= 0.22;
 					choppy = lerp(choppy,1.0,0.2);
 				}
 				return p.y - h;
 			}
 
 			float map_detailed(float3 p) {
+				float2x2 octave_m = float2x2(1.6,1.2,-1.2,1.6);
 				float freq = SEA_FREQ;
 				float amp = SEA_HEIGHT;
 				float choppy = SEA_CHOPPY;
 				float2 uv = p.xz; uv.x *= 0.75;
     
-				float d, h = 0.0;    
-				for(int i = 0; i < _LooPNUMS.y; i++) {        
-    				d = sea_octave((uv+SEA_TIME)*freq,choppy);
-    				d += sea_octave((uv-SEA_TIME)*freq,choppy);
+				float d, h = 0.0;   
+				for(int i = 0; i < MAPH_LOOP_NUM; i++) {        
+					d = sea_octave((uv+SEA_TIME)*freq,choppy);
+					d += sea_octave((uv-SEA_TIME)*freq,choppy);
 					h += d * amp;        
-    				uv = mul(octave_m,uv); freq *= 1.9; amp *= 0.22;
+					uv = mul(octave_m,uv); freq *= 1.9; amp *= 0.22;
 					choppy = lerp(choppy,1.0,0.2);
 				}
 				return p.y - h;
@@ -99,8 +145,8 @@ Shader "FishManShaderTutorial/Sea" {
     
 				float atten = max(1.0 - dot(dist,dist) * 0.001, 0.0);
 				color += SEA_WATER_COLOR * (p.y - SEA_HEIGHT) * 0.18 * atten;
-				float spec = specular(n,l,eye,60.0);
-				color += float3(spec,spec,spec);
+				float val = specular(n,l,eye,60.0);
+				color += float3(val,val,val);
     
 				return color;
 			}
@@ -115,42 +161,36 @@ Shader "FishManShaderTutorial/Sea" {
 				return normalize(n);
 			}
 
-			float heightMapTracing(float3 ori, float3 dir, out float3 p) {  
-				float tm = 0.0;
-				float tx = 1000.0;    
-				float hx = map(ori + dir * tx);
-				if(hx > 0.0) return tx;   
-				float hm = map(ori + dir * tm);    
-				float tmid = 0.0;
-				for(int i = 0; i < _LooPNUMS.z; i++) {
-					tmid = lerp(tm,tx, hm/(hm-hx));                   
-					p = ori + dir * tmid;                   
-    				float hmid = map(p);
-					if(hmid < 0.0) {
-        				tx = tmid;
-						hx = hmid;
-					} else {
-						tm = tmid;
-						hm = hmid;
-					}
+			float heightMapTracing(float3 ro, float3 rd) {  
+				float tmin = 0.1;
+				float tmax = 1000;
+				float t = tmin;
+				float hx = map(ro + rd * tmax);
+				if(hx > 0.0) return tmax;  
+				for( int i=0; i< RAY_MARCH_LOOP_NUM; i++ )
+				{
+					float3 p = ro + t*rd;
+					float h = map(p);
+					if( h<0.002 || t>tmax ) break;
+					t += 0.8*h;
 				}
-				return tmid;
+				return t;
 			}
 
-
-        
-            float4 ProcessRayMarch(float2 uv,float3 ro,float3 rd,inout float sceneDep,float4 sceneCol){ 
-				float3 p;
-				heightMapTracing(ro,rd,p);
-				float3 dist = p - ro;
-				float3 n = getNormal(p, dot(dist,dist) * EPSILON_NRM);
+            float4 ProcessRayMarch(float2 uv,float3 ori,float3 dir,inout float sceneDep,float4 sceneCol){ 
+				  // tracing
+				float t = heightMapTracing(ori,dir);
+				float3 p = ori + dir * t;
+				float3 dist = p - ori;
+				float3 n = getNormal(p, dot(dist,dist) * 0.1 / _ScreenParams.x);
+				
 				float3 light = normalize(float3(0.0,1.0,0.8)); 
              
 				// color
 				float3 col = lerp(
-					getSkyColor(rd),
-					getSeaColor(p,n,light,rd,dist),
-    				pow(smoothstep(0.0,-0.05,rd.y),0.3));
+					getSkyColor(dir),
+					getSeaColor(p,n,light,dir,dist),
+					pow(smoothstep(0.0,-0.05,dir.y),0.3));
                 sceneCol.xyz = col;
 				//sceneCol.xyz = n;
                 return sceneCol; 

@@ -192,6 +192,15 @@ float noise( in float3 x )
 	float2 rg = textureLod( iChannel1, (uv+0.5)/256.0, 0.0).yx;
 	return mix( rg.x, rg.y, f.z );
 }
+IQ fast noise2D https://www.shadertoy.com/view/XsX3RB
+float noise( in vec2 x )
+{
+    vec2 p = floor(x);
+    vec2 f = fract(x);
+	vec2 uv = p.xy + f.xy*f.xy*(3.0-2.0*f.xy);
+	return textureLod( iChannel0, (uv+118.4)/256.0, 0. ).x;
+}
+
 */
 
 // ²Î¿¼ MiloµÄ https://stackoverflow.com/questions/4297024/3d-perlin-noise-analytical-derivative

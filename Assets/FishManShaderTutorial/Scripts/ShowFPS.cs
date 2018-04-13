@@ -10,7 +10,7 @@ public class ShowFPS : MonoBehaviour {
 
     private int m_FrameUpdate = 0;//帧数;  
 
-    private float m_FPS = 0;
+    public float m_FPS = 0;
 
     void Awake() {
         Application.targetFrameRate = 100;
