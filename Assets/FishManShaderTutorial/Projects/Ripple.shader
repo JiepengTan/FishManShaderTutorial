@@ -30,7 +30,7 @@ Shader "FishManShaderTutorial/Ripple"
             #pragma vertex vert
             #pragma fragment frag
             #include "UnityCG.cginc"
-            //#include "../ShaderLibs/Noise.cginc"
+            //#include "ShaderLibs/Noise.cginc"
             struct appdata
             {
                 float4 vertex : POSITION;

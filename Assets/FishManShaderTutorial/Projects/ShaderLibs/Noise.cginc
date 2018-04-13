@@ -1,4 +1,9 @@
 // Merge by JiepengTan@gmail.com
+#ifndef FMST_NOISE
+#define FMST_NOISE
+
+#define PI 3.14159265359
+#define PI2 6.28318530718
 
 //https://www.shadertoy.com/view/4ssXRX   一些指定分布的Hash
 //https://www.shadertoy.com/view/4djSRW  不使用三角函数实现的Hash
@@ -188,6 +193,13 @@ float noise( in float3 x )
 	return mix( rg.x, rg.y, f.z );
 }
 */
+
+// 参考 Milo的 https://stackoverflow.com/questions/4297024/3d-perlin-noise-analytical-derivative
+
+
+
+
+
 float vnoise(float2 p)
 {
     float2 pi = floor(p);
@@ -431,3 +443,5 @@ float fbm6( in float2 p )
 }
 
 /**/
+
+#endif // FMST_NOISE

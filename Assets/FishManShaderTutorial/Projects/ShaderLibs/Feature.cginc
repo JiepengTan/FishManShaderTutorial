@@ -1,4 +1,7 @@
 // Merge by JiepengTan@gmail.com
+#ifndef FMST_FEATURE
+#define FMST_FEATURE
+
 #include "Noise.cginc"
 
 float CausticRotateMin(float2 uv, float time){
@@ -14,9 +17,8 @@ float CausticRotateMin(float2 uv, float time){
 
 float3 CausticTriTwist(float2 uv,float time )
 {
-	const float TAU = 6.28318530718;
 	const int MAX_ITER = 5;
-	float2 p = fmod(uv*TAU,TAU )-250.0;
+	float2 p = fmod(uv*PI2,PI2 )-250.0;
 
 	float2 i = float2(p);
 	float c = 1.0;
@@ -47,4 +49,29 @@ float CausticVoronoi(float2 p,float time) {
 	return v;
 }
 
+// 通过rd 来进行空间划分 这样在根据相机进行改变
+float3 Stars(in float3 rd,float den,float tileNum)
+{
+    float3 c = float3(0.,0.,0.);
+    float3 p = rd;
+	float SIZE = 0.5;
+    //分多层
+    for (float i=0.;i<3.;i++)
+    {
+        float3 q = frac(p*tileNum)-0.5;
+        float3 id = floor(p*tileNum);
+        float2 rn = hash33(id).xy;
+
+		float size = (hash13(id)*0.2+0.8)*SIZE; 
+		float demp = pow(1.-size/SIZE,.8)*0.45;
+		float val = (sin(_Time.y*31.*size)*demp+1.-demp) * size;
+        float c2 = 1.-smoothstep(0.,val,length(q));//画圆
+        c2 *= step(rn.x,(.0005+i*i*0.001)*den);//随机显示 随着深度的层数的增加添加更多的星星 增加每个grid 出现星星的概率
+        c += c2*(lerp(float3(1.0,0.49,0.1),float3(0.75,0.9,1.),rn.y)*0.25+0.75);//不同的亮度
+        p *= 1.4;//增加grid密度
+    }
+    return c*c*.7;
+}
 #define Caustic CausticRotateMin
+
+#endif // FMST_NOISE
