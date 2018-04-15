@@ -382,9 +382,9 @@ float3 wnoise( in float3 x ,float time)
     return float3( sqrt( res ), abs(id) );
 }
 
-const float2x2 m2 = float2x2( 0.80,  0.60, -0.60,  0.80 );
 float fbm( float2 p )
 {
+	const float2x2 m2 = float2x2( 0.80,  0.60, -0.60,  0.80 );
     float f = 0.0;
 
     f += 0.50000*noise( p ); p = mul(m2,p)*2.02;

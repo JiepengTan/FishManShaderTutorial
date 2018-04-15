@@ -1,0 +1,382 @@
+fileFormatVersion: 2
+guid: 5b177e30357cf154a8de7783e5bec538
+ModelImporter:
+  serializedVersion: 19
+  fileIDToRecycleName:
+    100000: dragon_bone_41
+    100002: dragon_bone_30
+    100004: dragon_bone_27
+    100006: dragon_bone_94
+    100008: //RootNode
+    100010: dragon_bone_69
+    100012: dragon_bone_108
+    100014: dragon_bone_90
+    100016: dragon_bone_65
+    100018: dragon_bone_47
+    100020: dragon_bone_34
+    100022: dragon_bone_26
+    100024: dragon_bone_88
+    100026: dragon_bone_62
+    100028: dragon_bone_104
+    100030: dragon_bone_84
+    100032: dragon_bone_58
+    100034: dragon_bone_46
+    100036: dragon_bone_33
+    100038: dragon_bone_25
+    100040: dragon_bone_57
+    100042: dragon_bone_45
+    100044: dragon_bone_32
+    100046: dragon_bone_56
+    100048: dragon_bone_44
+    100050: dragon_bone_31
+    100052: dragon_bone_24
+    100054: dragon_bone_21
+    100056: dragon_bone_15
+    100058: zuo
+    100060: dragon_bone_29
+    100062: dragon_bone_23
+    100064: dragon_bone_20
+    100066: dragon_bone_14
+    100068: dragon_bone_12
+    100070: dragon_bone_9
+    100072: dragon_bone_6
+    100074: dragon_bone_3
+    100076: dragon_bone_28
+    100078: dragon_bone_22
+    100080: dragon_bone_19
+    100082: dragon_bone_4
+    100084: group1
+    100086: dragon_bone_Head
+    100088: joint3
+    100090: joint1
+    100092: dragon_bone_Jaw
+    100094: zuoqi_2
+    100096: joint2
+    400000: dragon_bone_41
+    400002: dragon_bone_30
+    400004: dragon_bone_27
+    400006: dragon_bone_94
+    400008: //RootNode
+    400010: dragon_bone_69
+    400012: dragon_bone_108
+    400014: dragon_bone_90
+    400016: dragon_bone_65
+    400018: dragon_bone_47
+    400020: dragon_bone_34
+    400022: dragon_bone_26
+    400024: dragon_bone_88
+    400026: dragon_bone_62
+    400028: dragon_bone_104
+    400030: dragon_bone_84
+    400032: dragon_bone_58
+    400034: dragon_bone_46
+    400036: dragon_bone_33
+    400038: dragon_bone_25
+    400040: dragon_bone_57
+    400042: dragon_bone_45
+    400044: dragon_bone_32
+    400046: dragon_bone_56
+    400048: dragon_bone_44
+    400050: dragon_bone_31
+    400052: dragon_bone_24
+    400054: dragon_bone_21
+    400056: dragon_bone_15
+    400058: zuo
+    400060: dragon_bone_29
+    400062: dragon_bone_23
+    400064: dragon_bone_20
+    400066: dragon_bone_14
+    400068: dragon_bone_12
+    400070: dragon_bone_9
+    400072: dragon_bone_6
+    400074: dragon_bone_3
+    400076: dragon_bone_28
+    400078: dragon_bone_22
+    400080: dragon_bone_19
+    400082: dragon_bone_4
+    400084: group1
+    400086: dragon_bone_Head
+    400088: joint3
+    400090: joint1
+    400092: dragon_bone_Jaw
+    400094: zuoqi_2
+    400096: joint2
+    4300000: zuoqi_2
+    7400000: Take 001
+    7400002: walk
+    7400004: run
+    7400006: jumpstart
+    7400008: jump
+    7400010: jumpend
+    7400012: idle
+    7400014: idle0
+    9500000: //RootNode
+    11100000: //RootNode
+    13700000: joint1
+    13700002: zuoqi_2
+  materials:
+    importMaterials: 0
+    materialName: 0
+    materialSearch: 1
+  animations:
+    legacyGenerateAnimations: 3
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    motionNodeName: 
+    rigImportErrors: 
+    rigImportWarnings: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    animationCompression: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    clipAnimations:
+    - serializedVersion: 16
+      name: walk
+      takeName: 
+      firstFrame: 536
+      lastFrame: 581
+      wrapMode: 2
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 0
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: run
+      takeName: 
+      firstFrame: 633
+      lastFrame: 673
+      wrapMode: 2
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 0
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: jumpstart
+      takeName: 
+      firstFrame: 147
+      lastFrame: 162
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 0
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: jump
+      takeName: 
+      firstFrame: 584
+      lastFrame: 629
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 0
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: jumpend
+      takeName: 
+      firstFrame: 194
+      lastFrame: 195
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 0
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: idle
+      takeName: 
+      firstFrame: 242
+      lastFrame: 402
+      wrapMode: 2
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 0
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: idle0
+      takeName: 
+      firstFrame: 405
+      lastFrame: 485
+      wrapMode: 2
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 0
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 0.2
+    meshCompression: 3
+    addColliders: 0
+    importBlendShapes: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 0
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 4
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    serializedVersion: 2
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    rootMotionBoneName: 
+    rootMotionBoneRotation: {x: 0, y: 0, z: 0, w: 1}
+    hasTranslationDoF: 0
+    hasExtraRoot: 1
+    skeletonHasParents: 0
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 1
+  humanoidOversampling: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

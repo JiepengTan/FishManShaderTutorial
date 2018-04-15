@@ -11,7 +11,10 @@ public class CreateNoiseTex : MonoBehaviour {
     public int bordPixelNum = 16;
     // Use this for initialization
     void Start () {
-        Debug.Log("CreateNoiseTex at " + Application.dataPath);
+        ///CreateTex();
+    }
+
+    private void CreateTex() {
         Color[] colors = new Color[wid * hei];
         for (int i = 0; i < hei; i++) {
             for (int j = 0; j < wid; j++) {
