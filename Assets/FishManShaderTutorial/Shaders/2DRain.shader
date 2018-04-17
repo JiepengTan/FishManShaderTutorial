@@ -19,7 +19,7 @@ Shader "FishManShaderTutorial/2DRain"{
 	        #pragma vertex vert
 	        #pragma fragment frag
 			#pragma exclude_renderers d3d11_9x
-	        #include "UnityCG.cginc"
+			#include "ShaderLibs/Common.cginc"
 
 	        struct VertexOutput {
 	           	fixed4 pos : SV_POSITION;
@@ -30,11 +30,10 @@ Shader "FishManShaderTutorial/2DRain"{
 	        };
 
 		    fixed4x4 _FrustumCornersRay;
-	        fixed4 _MainTex_TexelSize;
 	        sampler2D _CameraDepthTexture;
 	        //Variables
             sampler2D _MainTex;
-            sampler2D _NoiseTex;
+	        fixed4 _MainTex_TexelSize;
 			float4 _LoopNum;
 			
 			#define AA 1   // make this 2 or even 3 if you have a really powerful GPU
@@ -97,9 +96,7 @@ Shader "FishManShaderTutorial/2DRain"{
 			}
  
 		
-			#define PI2 6.28318
 			fixed2 Rains(fixed2 uv, fixed seed, fixed m) {
-				float time = _Time.y;
 				float period = 5;//雨滴在格子中循环的周期
 				float2 retVal  = float2(0.0,0.0);
 				float aspectRatio = 4.0;//雨滴的宽高比

@@ -14,14 +14,7 @@ Shader "FishManShaderTutorial/Stars" {
 #include "ShaderLibs/MergeRayMarch.cginc"
 
             float4 ProcessRayMarch(float2 uv,float3 ro,float3 rd,inout float sceneDep,float4 sceneCol)  {
-                fixed4 sph = fixed4(0.0,0.0,0.0, 0.5);
-                fixed3 col = fixed3(0.0,0.0,0.0); 
-               
-                //if (sceneDep > 800 )  
-                {     
-                    float3 bg = Stars(rd,3.,50.);  
-                    sceneCol.xyz = bg;
-                }
+                sceneCol.xyz =  Stars(rd,3.,50.);
                 return sceneCol;
             } 
             ENDCG

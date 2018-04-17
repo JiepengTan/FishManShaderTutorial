@@ -4,6 +4,7 @@
 
 #define PI 3.14159265359
 #define PI2 6.28318530718
+#define Deg2Radius PI/180.
 
 //https://www.shadertoy.com/view/4ssXRX   一些指定分布的Hash
 //https://www.shadertoy.com/view/4djSRW  不使用三角函数实现的Hash
@@ -14,6 +15,9 @@
 #define HASHSCALE3 float3(.1031, .1030, .0973)
 #define HASHSCALE4 float4(.1031, .1030, .0973, .1099)
 //----------------------------------------------------------------------------------------
+
+
+sampler2D _NoiseTex;
 //  1 out, 1 in...
 float hash11(float p)
 {
@@ -140,8 +144,83 @@ float4 hash44(float4 p4)
 // https://www.shadertoy.com/view/ldc3RB 
 // https://www.shadertoy.com/view/4sc3z2
 
+
+// 带导数的noise的推导请参考Milo的 https://stackoverflow.com/questions/4297024/3d-perlin-noise-analytical-derivative
+float3 noised( in float2 p )
+{
+    float2 i = floor( p );
+    float2 f = frac( p );
+
+#if 1
+    // quintic interpolation
+    float2 u = f*f*f*(f*(f*6.0-15.0)+10.0);
+    float2 du = 30.0*f*f*(f*(f-2.0)+1.0);
+#else
+    // cubic interpolation
+    float2 u = f*f*(3.0-2.0*f);
+    float2 du = 6.0*f*(1.0-f);
+#endif    
+    
+    float2 ga = hash22( i + float2(0.0,0.0) );
+    float2 gb = hash22( i + float2(1.0,0.0) );
+    float2 gc = hash22( i + float2(0.0,1.0) );
+    float2 gd = hash22( i + float2(1.0,1.0) );
+    
+    float va = dot( ga, f - float2(0.0,0.0) );
+    float vb = dot( gb, f - float2(1.0,0.0) );
+    float vc = dot( gc, f - float2(0.0,1.0) );
+    float vd = dot( gd, f - float2(1.0,1.0) );
+
+    return float3( va + u.x*(vb-va) + u.y*(vc-va) + u.x*u.y*(va-vb-vc+vd),   // value
+                 ga + u.x*(gb-ga) + u.y*(gc-ga) + u.x*u.y*(ga-gb-gc+gd) +  // derivatives
+                 du * (u.yx*(va-vb-vc+vd) + float2(vb,vc) - va));
+}
+
+// return value noise (in x) and its derivatives (in yzw)
+float4 noised( in float3 x )
+{
+    // grid
+    float3 p = floor(x);
+    float3 w = frac(x);
+    
+    #if 1
+    // quintic interpolant
+    float3 u = w*w*w*(w*(w*6.0-15.0)+10.0);
+    float3 du = 30.0*w*w*(w*(w-2.0)+1.0);
+    #else
+    // cubic interpolant
+    float3 u = w*w*(3.0-2.0*w);
+    float3 du = 6.0*w*(1.0-w);
+    #endif    
+    
+    // gradients
+    float3 ga = hash33( p+float3(0.0,0.0,0.0) );
+    float3 gb = hash33( p+float3(1.0,0.0,0.0) );
+    float3 gc = hash33( p+float3(0.0,1.0,0.0) );
+    float3 gd = hash33( p+float3(1.0,1.0,0.0) );
+    float3 ge = hash33( p+float3(0.0,0.0,1.0) );
+    float3 gf = hash33( p+float3(1.0,0.0,1.0) );
+    float3 gg = hash33( p+float3(0.0,1.0,1.0) );
+    float3 gh = hash33( p+float3(1.0,1.0,1.0) );
+    
+    // projections
+    float va = dot( ga, w-float3(0.0,0.0,0.0) );
+    float vb = dot( gb, w-float3(1.0,0.0,0.0) );
+    float vc = dot( gc, w-float3(0.0,1.0,0.0) );
+    float vd = dot( gd, w-float3(1.0,1.0,0.0) );
+    float ve = dot( ge, w-float3(0.0,0.0,1.0) );
+    float vf = dot( gf, w-float3(1.0,0.0,1.0) );
+    float vg = dot( gg, w-float3(0.0,1.0,1.0) );
+    float vh = dot( gh, w-float3(1.0,1.0,1.0) );
+    
+    // interpolations
+    return float4( va + u.x*(vb-va) + u.y*(vc-va) + u.z*(ve-va) + u.x*u.y*(va-vb-vc+vd) + u.y*u.z*(va-vc-ve+vg) + u.z*u.x*(va-vb-ve+vf) + (-va+vb+vc-vd+ve-vf-vg+vh)*u.x*u.y*u.z,    // value
+                 ga + u.x*(gb-ga) + u.y*(gc-ga) + u.z*(ge-ga) + u.x*u.y*(ga-gb-gc+gd) + u.y*u.z*(ga-gc-ge+gg) + u.z*u.x*(ga-gb-ge+gf) + (-ga+gb+gc-gd+ge-gf-gg+gh)*u.x*u.y*u.z +   // derivatives
+                 du * (float3(vb,vc,ve) - va + u.yzx*float3(va-vb-vc+vd,va-vc-ve+vg,va-vb-ve+vf) + u.zxy*float3(va-vb-ve+vf,va-vb-vc+vd,va-vc-ve+vg) + u.yzx*u.zxy*(-va+vb+vc-vd+ve-vf-vg+vh) ));
+}
+
+
 #ifdef USING_TEXLOD_NOISE
-sampler2D _NoiseTex;
 //IQ fast noise3D https://www.shadertoy.com/view/ldScDh
 float noise( in float3 x )
 {
@@ -164,7 +243,6 @@ float noise( in float2 x )
 } 
 /**/
 
-// 带导数的noise的推导请参考Milo的 https://stackoverflow.com/questions/4297024/3d-perlin-noise-analytical-derivative
 #else
 float noise(float2 p)
 {

@@ -14,7 +14,6 @@ Shader "FishManShaderTutorial/Cloud2" {
 #include "ShaderLibs/MergeRayMarch.cginc"
 
             float4 _LoopNum ;
-            #define time _Time.y
 
 
 			fixed map5( in fixed3 p )

@@ -1,7 +1,7 @@
 // Motion vector shader for Skinner Particle
-#include "UnityCG.cginc"
-#include "Noise.cginc"
-#include "Math.cginc"
+#include "Common.cginc"
+#include "Feature.cginc"
+
 sampler2D _MainTex;
 float2 _MainTex_TexelSize;
 float4x4 _FrustumCornersRay;

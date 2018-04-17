@@ -2,7 +2,7 @@
 #ifndef FMST_FEATURE
 #define FMST_FEATURE
 
-#include "Noise.cginc"
+#include "Common.cginc"
 
 float CausticRotateMin(float2 uv, float time){
 	float3x3 mat = float3x3(2,1,-2, 3,-2,1, 1,2,2);
@@ -72,6 +72,56 @@ float3 Stars(in float3 rd,float den,float tileNum)
     }
     return c*c*.7;
 }
+
+
+float TimeFBM( float2 p,float t )
+{
+    float2 f = 0.0;
+	float s = 0.5;
+	float sum =0;
+	for(int i=0;i<5;i++){
+		p += t;t *=1.5;
+		f += s*tex2D(_NoiseTex, p/256).x; p = mul(float2x2(0.8,-0.6,0.6,0.8),p)*2.02;
+		sum+= s;s*=0.6;
+	}
+    return f/sum;	 
+}
+
+float3 Cloud(float3 bgCol,float3 ro,float3 rd,float3 cloudCol,float spd, float layer)
+{
+	float3 col = bgCol;
+    float time = _Time.y*0.05*spd;
+	for(int i=0; i<layer; i++){
+		float2 sc = ro.xz + rd.xz*((i+3)*40000.0-ro.y)/rd.y;
+		col = lerp( col, cloudCol, 0.5*smoothstep(0.5,0.8,TimeFBM(0.00002*sc,time*(i+3))) );
+	}
+	return col;
+}
+
+fixed3 Fog(in fixed3 bgCol, in fixed3 ro, in fixed3 rd, in fixed maxT,
+				float3 fogCol,float3 spd,float2 heightRange)
+{
+	fixed d = .4;
+	float3 col = bgCol;
+	for(int i=0; i<7; i++)
+	{
+		fixed3  p = ro + rd*d;
+		// add some movement at some dir
+		p += spd * ftime;
+		p.z += sin(p.x*.5);
+		// get height desity 
+		float hDen = (1.-smoothstep(heightRange.x,heightRange.y,p.y));
+		// get final  density
+		fixed den = tnoise(p*2.2/(d+20.),ftime, 0.2)* hDen;
+		fixed3 col2 = fogCol *( den *0.5+0.5);
+		col = lerp(col,col2,clamp(den*smoothstep(d-0.4,d+2.+d*.75,maxT),0.,1.) );
+		d *= 1.5+0.3; 
+		if (d>maxT)break;
+	}
+	return col;
+}
+
+
 #define Caustic CausticRotateMin
 
 #endif // FMST_NOISE

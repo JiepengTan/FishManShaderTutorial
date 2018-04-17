@@ -19,7 +19,7 @@ Shader "FishManShaderTutorial/2DSnow"{
 	        #pragma vertex vert
 	        #pragma fragment frag
 			#pragma exclude_renderers d3d11_9x
-	        #include "UnityCG.cginc"
+			#include "ShaderLibs/Common.cginc"
 
 	        struct VertexOutput {
 	           	fixed4 pos : SV_POSITION;
@@ -34,7 +34,6 @@ Shader "FishManShaderTutorial/2DSnow"{
 	        sampler2D _CameraDepthTexture;
 	        //Variables
             sampler2D _MainTex;
-            sampler2D _NoiseTex;
 			float4 _LoopNum;
 			
 			#define AA 1   // make this 2 or even 3 if you have a really powerful GPU
@@ -102,7 +101,6 @@ Shader "FishManShaderTutorial/2DSnow"{
 				return fixed2(x,y);
 			}
 			float3 SnowSingleLayer(float2 uv,float layer){
-				float time = _Time.y;
 				fixed3 acc = fixed3(0.0,0.0,0.0);//让雪花的大小变化
 				uv = uv * (2.0+layer);//透视视野变大效果
 			    float xOffset = uv.y * (((Rand11(layer)*2-1.)*0.5+1.)*XSPEED);//增加x轴移动

@@ -8,46 +8,22 @@ Shader "FishManShaderTutorial/Fog" {
 		_FogCol ("_FogCol", COLOR) = (.025, .2, .125,0.)
 		
     }
-    SubShader{
+    SubShader{ 
         Pass {
             ZTest Always Cull Off ZWrite Off
             CGPROGRAM
             float4 _LoopNum = float4(40.,128.,0.,0.);
-            float4 _FogSpd ;
-			float4 _FogHighRange;
+            float3 _FogSpd ;
+			float2 _FogHighRange;
 			fixed3 _FogCol;
-			
+			 
 #pragma vertex VertMergeRayMarch  
 #pragma fragment FragMergeRayMarch  
-#include "ShaderLibs/MergeRayMarch.cginc"
+#include "ShaderLibs/MergeRayMarch.cginc" 
             // value noise, and its analytical derivatives
     				/*	*/
-			#define ITR 100
+			#define ITR 100 
 			#define FAR 30.
-			#define time _Time.y
-			
-
-			fixed fogmap(in fixed3 p, in fixed d)
-			{
-				p += _FogSpd.xyz * time;
-				p.z += sin(p.x*.5);
-				return tnoise(p*2.2/(d+20.),time, 0.2)*(1.-smoothstep(_FogHighRange.x,_FogHighRange.y,p.y));
-			}
-		
-			fixed3 fog(in fixed3 col, in fixed3 ro, in fixed3 rd, in fixed mt)
-			{
-				fixed d = .4;
-				for(int i=0; i<7; i++)
-				{
-					fixed3  pos = ro + rd*d;
-					fixed rz = fogmap(pos, d);
-					fixed3 col2 = _FogCol *( rz *0.5+0.5);
-					col = lerp(col,col2,clamp(rz*smoothstep(d-0.4,d+2.+d*.75,mt),0.,1.) );
-					d *= 1.5+0.3;
-					if (d>mt)break;
-				}
-				return col;
-			}
 			
 
 			fixed3 normal(in fixed3 p)
@@ -90,7 +66,7 @@ Shader "FishManShaderTutorial/Fog" {
 				}
 				col = lerp(col, fogb, smoothstep(FAR-7.,FAR,rz));
 				//then volumetric fog
-				col = fog(col, ro, rd, rz);
+				col = Fog(col, ro, rd, rz,_FogCol,_FogSpd,_FogHighRange);
 				//post
 				col = pow(col,float3(0.8,0.8,0.8));
                 sceneCol.xyz = col;

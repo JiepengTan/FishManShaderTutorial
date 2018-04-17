@@ -17,7 +17,6 @@ Shader "FishManShaderTutorial/Sea" {
 #pragma fragment FragMergeRayMarch  
 #include "ShaderLibs/MergeRayMarch.cginc"
 
-			#define time _Time.y
 			float3 _SeaBaseColor;
 			float3 _SeaWaterColor;
             float4 _LoopNum;

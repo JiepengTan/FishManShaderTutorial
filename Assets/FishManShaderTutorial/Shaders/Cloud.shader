@@ -14,7 +14,6 @@ Shader "FishManShaderTutorial/Cloud" {
 #include "ShaderLibs/MergeRayMarch.cginc"
 
             float4 _LoopNum ;
-            #define time _Time.y
             float moy = 0.;
 
             float fbmss(in float3 x)
