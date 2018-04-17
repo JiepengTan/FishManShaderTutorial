@@ -2,13 +2,13 @@
 using System.Collections;
 
 [ExecuteInEditMode]
-public class MergeRayMarch : PostEffectsBase {
-	//public Shader shader;
-	private Material _mat = null;
-
+[RequireComponent(typeof(Camera))]
+public class MergeRayMarch : MonoBehaviour {
     public Material material;
+    public Texture2D _NoiseTex;
+    public Vector4 _LoopNum;
 
-	private Camera myCamera;
+    private Camera myCamera;
 	public new Camera camera {
 		get {
 			if (myCamera == null) {
@@ -29,11 +29,15 @@ public class MergeRayMarch : PostEffectsBase {
 		}
 	}
 
-    public Texture2D _NoiseTex;
-    public Vector4 _LoopNum;
 
+    private void Start() {
+        if (material == null || material.shader == null || !material.shader.isSupported) {
+            this.enabled = false;
+            return;
+        }
+    }
     void OnEnable() {
-		camera.depthTextureMode |= DepthTextureMode.Depth;
+        camera.depthTextureMode |= DepthTextureMode.Depth;
 	}
 
     [ImageEffectOpaque]
