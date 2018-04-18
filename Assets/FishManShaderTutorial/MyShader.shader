@@ -29,6 +29,8 @@ Shader "FishManShaderTutorial/MyShader"{
 	        fixed4 _MainTex_TexelSize;
 	        sampler2D _CameraDepthTexture;
 	        //Variables
+float4 _iMouse;
+sampler2D _SecondTex;
 sampler2D _MainTex;
 
 
@@ -87,197 +89,278 @@ sampler2D _MainTex;
 	        }//end frag
 
 //-----------------------------------------------------
-	        // a sunny day of sea - by JiepengTan - 2018
-// jiepengtan@gmail.com
+	        // Created by inigo quilez - iq/2013
 // License Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License.
 
 
-#define  SIZE  0.5
-#define WATER_DEEP 0.6
-#define PI 3.1415927
-#define Deg2Radius PI/180.
+// on the derivatives based noise: http://iquilezles.org/www/articles/morenoise/morenoise.htm
+// on the soft shadow technique: http://iquilezles.org/www/articles/rmshadows/rmshadows.htm
+// on the fog calculations: http://iquilezles.org/www/articles/fog/fog.htm
+// on the lighting: http://iquilezles.org/www/articles/outdoorslighting/outdoorslighting.htm
+// on the raymarching: http://iquilezles.org/www/articles/terrainmarching/terrainmarching.htm
 
-fixed Rand(fixed x)
+
+#define AA 1   // make this 2 or even 3 if you have a really powerful GPU
+
+
+#define SC (250.0)
+
+// value noise, and its analytical derivatives
+fixed3 noised( in fixed2 x )
 {
-    return frac(sin(x*866353.13)*613.73);
-}
+    fixed2 f = frac(x);
+    fixed2 u = f*f*(3.0-2.0*f);
 
-fixed2x2 Rotate2D(fixed deg){
-    deg = deg * Deg2Radius;
-	return fixed2x2(cos(deg),sin(deg),-sin(deg),cos(deg));
-}
-fixed2 Within(fixed2 uv, fixed4 rect) {
-	return (uv-rect.xy)/(rect.zw-rect.xy);
-}
-fixed Remap(fixed a,fixed b,fixed c,fixed d,fixed val){
-	return (val-a)/(b-a) * (d-c) + c;
-}
-
-fixed Circle(fixed2 uv,fixed2 center,fixed size,fixed blur){
-	uv = uv - center;
-	uv /= size;
-	fixed len = length(uv);
-	return smoothstep(1.,1.-blur,len);
-}
-
-fixed PureCircle(fixed2 uv,fixed2 center,fixed size,fixed blur,fixed powVal){
-	uv = uv - center;
-	uv /= size;
-	fixed len = 1.-length(uv);
-    fixed val = clamp(Remap(0.,blur,0.,1.,len),0.,1.);
-    return pow(val,powVal);//* pow(1.+len * 3.,0.1);
-}
-fixed Ellipse(fixed2 uv,fixed2 center,fixed2 size,fixed blur){
-	uv = uv - center;
-	uv /= size;
-	fixed len = length(uv);
-	return smoothstep(1.,1.-blur,len);
-}
-
-
-fixed3 Draw3DFrame(fixed2 uv){
-    //cameraPos  
-    fixed3 camPos = fixed3(0.,0.,-3);
-    //Torus 
-	fixed3 frameCol = fixed3(0.9,0.75,0.6);
-    fixed frameMask = Circle(uv,fixed2(0.,0.),SIZE*1.1,0.01) - 
-        Circle(uv,fixed2(0.,0.),SIZE,0.01);
-    return fixed3(0.,0.,0.);
+#if 1
+    // texel fetch version
+    int2 p = int2(floor(x));
+    fixed a = tex2D( _MainTex, (p+int2(0,0))&255, 0 ).x;
+	fixed b = tex2D( _MainTex, (p+int2(1,0))&255, 0 ).x;
+	fixed c = tex2D( _MainTex, (p+int2(0,1))&255, 0 ).x;
+	fixed d = tex2D( _MainTex, (p+int2(1,1))&255, 0 ).x;
+#else    
+    // tex2D version    
+    fixed2 p = floor(x);
+	fixed a = tex2Dlod( _MainTex,float4( (p+fixed2(0.5,0.5))/256.0, 0.0 ,0)).x;
+	fixed b = tex2Dlod( _MainTex,float4( (p+fixed2(1.5,0.5))/256.0, 0.0 ,0)).x;
+	fixed c = tex2Dlod( _MainTex,float4( (p+fixed2(0.5,1.5))/256.0, 0.0 ,0)).x;
+	fixed d = tex2Dlod( _MainTex,float4( (p+fixed2(1.5,1.5))/256.0, 0.0 ,0)).x;
+#endif
     
-}
-fixed Torus2D(fixed2 uv,fixed2 center,fixed2 size,fixed blur){
-	uv = uv - center;
-	fixed len = length(uv);
-    if(len<size.y || len >size.x)
-        return 0.;
-    fixed radio = (len-size.y)/(size.x-size.y);
-    fixed val = 1.-abs((radio-0.5)*2.);
-	return pow(val,blur);
+	return fixed3(a+(b-a)*u.x+(c-a)*u.y+(a-b-c+d)*u.x*u.y,
+				6.0*f*(1.0-f)*(fixed2(b-a,c-a)+(a-b-c+d)*u.yx));
 }
 
-fixed3 DrawFrame(fixed2 uv){
-    fixed3 frameCol = fixed3(0.9,0.75,0.6);
-    fixed frameMask = Circle(uv,fixed2(0.,0.),SIZE*1.1,0.01) - 
-        Circle(uv,fixed2(0.,0.),SIZE,0.01);
-    //return frameCol * frameMask;
-    return Torus2D(uv,fixed2(0.,0.),fixed2(SIZE * 1.1,SIZE),0.2) *frameCol;
-}
-fixed3 DrawHightLight(fixed2 uv){
-    //up
-    fixed3 hlCol = fixed3(0.95,0.95,0.95);
-    fixed upMask = Ellipse(uv,fixed2(0.,0.8)*SIZE,fixed2(0.9,0.7)*SIZE,0.6)*0.9;
-    upMask = upMask * Circle(uv,fixed2(0.,0.)*SIZE,SIZE*0.95,0.02) ;
-    upMask = upMask * Circle(uv,fixed2(0.,-0.9)*SIZE,SIZE*1.1,-0.8) ;
-    //bottom
-    uv *= Rotate2D(30.);
-    fixed btMask =1.;
-    btMask *=  Circle(uv,fixed2(0.,0.)*SIZE,SIZE*0.95,0.02);
-    fixed scale = 0.9;
-    btMask *= 1.- Circle(uv,fixed2(0.,-0.17+scale)*SIZE,SIZE*(1.+scale),0.2) ;
-    return  (upMask + btMask) * hlCol;
-    
-}
+const fixed2x2 m2 = fixed2x2(0.8,-0.6,0.6,0.8);
 
 
-fixed GetWaveHeight(fixed2 uv){
-    uv = Rotate2D(-30.)*uv;
-	fixed wave =  0.12*sin(-2.*uv.x+_Time.y*4.); 
-	uv = Rotate2D(-50.)*uv;
-	wave +=  0.05*sin(-2.*uv.x+_Time.y*4.); 
-	return wave;
-}
-
-fixed RayMarchWater(fixed3 camera, fixed3 dir,fixed startT,fixed maxT){
-    fixed3 pos = camera + dir * startT;
-    fixed t = startT;
+fixed terrainH( in fixed2 x )
+{
+	fixed2  p = x*0.003/SC;
+    fixed a = 0.0;
+    fixed b = 1.0;
+	fixed2  d = fixed2(0.0,0.0);
     [unroll(100)]
-for(int i=0;i<200;i++){
-        if(t > maxT){
-        	return -1.;
-        }
-        fixed h = GetWaveHeight(pos.xz) * WATER_DEEP;
-        if(h + 0.01 > pos.y ) {//+ 0.01 acc intersect speed
-            // get the intersect point
-            return t;
-        }
-        t += pos.y - h; 
-        pos = camera + dir * t;
+for( int i=0; i<15; i++ )
+    {
+        fixed3 n = noised(p);
+        d += n.yz;
+        a += b*n.x/(1.0+dot(d,d));
+		b *= 0.5;
+        p = m2*p*2.0;
     }
-    return -1.0;
+
+	return SC*120.0*a;
 }
 
-fixed4 SimpleWave3D(fixed2 uv,fixed3 col){
-	fixed3 camPos =fixed3(0.23,0.115,-2.28);
-    fixed3 targetPos = fixed3(0.,0.,0.);
-    
-    fixed3 f = normalize(targetPos-camPos);
-    fixed3 r = cross(fixed3(0., 1., 0.), f);
-    fixed3 u = cross(f, r);
-    
-    fixed3 ray = normalize(uv.x*r+uv.y*u+1.0*f);
-    
-	fixed startT = 0.1;
-    fixed maxT = 20.;
-	fixed dist = RayMarchWater(camPos, ray,startT,maxT);
-    fixed3 pos = camPos + ray * dist;
-	//only need a small circle
-    fixed circleSize = 2.;
-    if(dist < 0.){
-    	return fixed4(0.,0.,0.,0.);
+fixed terrainM( in fixed2 x )
+{
+	fixed2  p = x*0.003/SC;
+    fixed a = 0.0;
+    fixed b = 1.0;
+	fixed2  d = fixed2(0.0,0.0);
+    [unroll(100)]
+for( int i=0; i<9; i++ )
+    {
+        fixed3 n = noised(p);
+        d += n.yz;
+        a += b*n.x/(1.0+dot(d,d));
+		b *= 0.5;
+        p = m2*p*2.0;
     }
-    fixed2 offsetPos = pos.xz;
-    if(length(offsetPos)>circleSize){
-    	return fixed4(0.,0.,0.,0.);
+	return SC*120.0*a;
+}
+
+fixed terrainL( in fixed2 x )
+{
+	fixed2  p = x*0.003/SC;
+    fixed a = 0.0;
+    fixed b = 1.0;
+	fixed2  d = fixed2(0.0,0.0);
+    [unroll(100)]
+for( int i=0; i<3; i++ )
+    {
+        fixed3 n = noised(p);
+        d += n.yz;
+        a += b*n.x/(1.0+dot(d,d));
+		b *= 0.5;
+        p = m2*p*2.0;
     }
-    fixed colVal = 1.-((pos.z+0.)/circleSize +1.0) *.5;//0~1
-	return fixed4(col*smoothstep(0.,1.4,colVal),1.);
+
+	return SC*120.0*a;
 }
-fixed SmoothCircle(fixed2 uv,fixed2 offset,fixed size){
-    uv -= offset;
-    uv/=size;
-    fixed temp = clamp(1.-length(uv),0.,1.);
-    return smoothstep(0.,1.,temp);
+
+fixed interesct( in fixed3 ro, in fixed3 rd, in fixed tmin, in fixed tmax )
+{
+    fixed t = tmin;
+	[unroll(100)]
+for( int i=0; i<256; i++ )
+	{
+        fixed3 pos = ro + t*rd;
+		fixed h = pos.y - terrainM( pos.xz );
+		if( h<(0.002*t) || t>tmax ) break;
+		t += 0.5*h;
+	}
+
+	return t;
 }
-fixed DrawBubble(fixed2 uv,fixed2 offset,fixed size){
-    uv = (uv - offset)/size;
-    fixed val = 0.;
-    val = length(uv);
-    val = smoothstep(0.5,2.,val)*step(val,1.);
-    
-    val +=SmoothCircle(uv,fixed2(-0.2,0.3),0.6)*0.4;
-    val +=SmoothCircle(uv,fixed2(0.4,-0.5),0.2)*0.2;
-	return val; 
+
+fixed softShadow(in fixed3 ro, in fixed3 rd )
+{
+    fixed res = 1.0;
+    fixed t = 0.001;
+	[unroll(100)]
+for( int i=0; i<80; i++ )
+	{
+	    fixed3  p = ro + t*rd;
+        fixed h = p.y - terrainM( p.xz );
+		res = min( res, 16.0*h/t );
+		t += h;
+		if( res<0.001 ||p.y>(SC*200.0) ) break;
+	}
+	return clamp( res, 0.0, 1.0 );
 }
-fixed DrawBubbles(fixed2 uv){
-	uv = Within(uv, fixed4(-SIZE,-SIZE,SIZE,SIZE));
-    uv.x-=0.5;
-    fixed val = 0.;
-    const fixed count = 2.;// bubble num per second
-    const fixed maxVY = 0.1;
-    const fixed ay = -.3;
-    const  fixed ax = -.5;
-    const  fixed maxDeg = 80.;
-    const fixed loopT = maxVY/ay + (1.- 0.5*maxVY*maxVY/ay)/maxVY;
-    const  fixed num = loopT*count;
-	for(fixed i=1.;i<num;i++){
-    	fixed size = 0.02*Rand(i*451.31)+0.02;
-        fixed t = fmod(_Time.y + Rand(i)*loopT,loopT);
-        fixed deg = (Rand(i*1354.54)*maxDeg +(90.-maxDeg*0.5))*Deg2Radius;
-        fixed2 vel = fixed2(cos(deg),sin(deg));
-        fixed ty = max((vel.y*0.3 - maxVY),0.)/ay;
-        fixed yt = clamp(t,0.,ty);
-		fixed y = max(0.,abs(vel.y)*yt + 0.5*ay*yt*yt) + max(0.,t-ty)*maxVY;
+
+fixed3 calcNormal( in fixed3 pos, fixed t )
+{
+    fixed2  eps = fixed2( 0.002*t, 0.0 );
+    return normalize( fixed3( terrainH(pos.xz-eps.xy) - terrainH(pos.xz+eps.xy),
+                            2.0*eps.x,
+                            terrainH(pos.xz-eps.yx) - terrainH(pos.xz+eps.yx) ) );
+}
+
+fixed fbm( fixed2 p )
+{
+    fixed f = 0.0;
+    f += 0.5000*tex2D( _MainTex, p/256.0 ).x; p = m2*p*2.02;
+    f += 0.2500*tex2D( _MainTex, p/256.0 ).x; p = m2*p*2.03;
+    f += 0.1250*tex2D( _MainTex, p/256.0 ).x; p = m2*p*2.01;
+    f += 0.0625*tex2D( _MainTex, p/256.0 ).x;
+    return f/0.9375;
+}
+
+const fixed kMaxT = 5000.0*SC;
+
+fixed4 render( in fixed3 ro, in fixed3 rd )
+{
+    fixed3 light1 = normalize( fixed3(-0.8,0.4,-0.3) );
+    // bounding plane
+    fixed tmin = 1.0;
+    fixed tmax = kMaxT;
+#if 1
+    fixed maxh = 300.0*SC;
+    fixed tp = (maxh-ro.y)/rd.y;
+    if( tp>0.0 )
+    {
+        if( ro.y>maxh ) tmin = max( tmin, tp );
+        else            tmax = min( tmax, tp );
+    }
+#endif
+	fixed sundot = clamp(dot(rd,light1),0.0,1.0);
+	fixed3 col;
+    fixed t = interesct( ro, rd, tmin, tmax );
+    if( t>tmax)
+    {
+        // sky		
+        col = fixed3(0.2,0.5,0.85)*1.1 - rd.y*rd.y*0.5;
+        col = lerp( col, 0.85*fixed3(0.7,0.75,0.85), pow( 1.0-max(rd.y,0.0), 4.0 ) );
+        // sun
+		col += 0.25*fixed3(1.0,0.7,0.4)*pow( sundot,5.0 );
+		col += 0.25*fixed3(1.0,0.8,0.6)*pow( sundot,64.0 );
+		col += 0.2*fixed3(1.0,0.8,0.6)*pow( sundot,512.0 );
+        // clouds
+		fixed2 sc = ro.xz + rd.xz*(SC*1000.0-ro.y)/rd.y;
+		col = lerp( col, fixed3(1.0,0.95,1.0), 0.5*smoothstep(0.5,0.8,fbm(0.0005*sc/SC)) );
+        // horizon
+        col = lerp( col, 0.68*fixed3(0.4,0.65,1.0), pow( 1.0-max(rd.y,0.0), 16.0 ) );
+        t = -1.0;
+	}
+	else
+	{
+        // mountains		
+		fixed3 pos = ro + t*rd;
+        fixed3 nor = calcNormal( pos, t );
+        //nor = normalize( nor + 0.5*( fixed3(-1.0,0.0,-1.0) + fixed3(2.0,1.0,2.0)*tex2D(_SecondTex,0.01*pos.xz).xyz) );
+        fixed3 ref = reflect( rd, nor );
+        fixed fre = clamp( 1.0+dot(rd,nor), 0.0, 1.0 );
+        fixed3 hal = normalize(light1-rd);
         
-        fixed tx = abs(vel.x/ax);
-        t = min(tx,t);
-        fixed xOffset = abs(vel.x)*t+0.5*ax*t*t + sin(_Time.y*(0.5+Rand(i)*2.)+Rand(i)*2.*PI)*0.03;
-        fixed x = sign(vel.x)*xOffset;
-        fixed2 offset = fixed2(x,y);
-    	val += DrawBubble(uv,offset,size*0.5);
-    }
-	return val;
+        // rock
+		fixed r = tex2D( _MainTex, (7.0/SC)*pos.xz/256.0 ).x;
+        col = (r*0.25+0.75)*0.9*lerp( fixed3(0.08,0.05,0.03), fixed3(0.10,0.09,0.08), 
+                                     tex2D(_MainTex,0.00007*fixed2(pos.x,pos.y*48.0)/SC).x );
+		col = lerp( col, 0.20*fixed3(0.45,.30,0.15)*(0.50+0.50*r),smoothstep(0.70,0.9,nor.y) );
+        col = lerp( col, 0.15*fixed3(0.30,.30,0.10)*(0.25+0.75*r),smoothstep(0.95,1.0,nor.y) );
+
+		// snow
+		fixed h = smoothstep(55.0,80.0,pos.y/SC + 25.0*fbm(0.01*pos.xz/SC) );
+        fixed e = smoothstep(1.0-0.5*h,1.0-0.1*h,nor.y);
+        fixed o = 0.3 + 0.7*smoothstep(0.0,0.1,nor.x+h*h);
+        fixed s = h*e*o;
+        col = lerp( col, 0.29*fixed3(0.62,0.65,0.7), smoothstep( 0.1, 0.9, s ) );
+		
+         // lighting		
+        fixed amb = clamp(0.5+0.5*nor.y,0.0,1.0);
+		fixed dif = clamp( dot( light1, nor ), 0.0, 1.0 );
+		fixed bac = clamp( 0.2 + 0.8*dot( normalize( fixed3(-light1.x, 0.0, light1.z ) ), nor ), 0.0, 1.0 );
+		fixed sh = 1.0; if( dif>=0.0001 ) sh = softShadow(pos+light1*SC*0.05,light1);
+		
+		fixed3 lin  = fixed3(0.0,0.0,0.0);
+		lin += dif*fixed3(7.00,5.00,3.00)*1.3*fixed3( sh, sh*sh*0.5+0.5*sh, sh*sh*0.8+0.2*sh );
+		lin += amb*fixed3(0.40,0.60,1.00)*1.2;
+        lin += bac*fixed3(0.40,0.50,0.60);
+		col *= lin;
+        
+        //col += s*0.1*pow(fre,4.0)*fixed3(7.0,5.0,3.0)*sh * pow( clamp(dot(nor,hal), 0.0, 1.0),16.0);
+        col += s*
+               (0.04+0.96*pow(clamp(1.0+dot(hal,rd),0.0,1.0),5.0))*
+               fixed3(7.0,5.0,3.0)*dif*sh*
+               pow( clamp(dot(nor,hal), 0.0, 1.0),16.0);
+        
+        
+        col += s*0.1*pow(fre,4.0)*fixed3(0.4,0.5,0.6)*smoothstep(0.0,0.6,ref.y);
+
+		// fog
+        fixed fo = 1.0-exp(-pow(0.001*t/SC,1.5) );
+        fixed3 fco = 0.65*fixed3(0.4,0.65,1.0);// + 0.1*fixed3(1.0,0.8,0.5)*pow( sundot, 4.0 );
+        col = lerp( col, fco, fo );
+
+	}
+    // sun scatter
+    col += 0.3*fixed3(1.0,0.7,0.3)*pow( sundot, 8.0 );
+
+    // gamma
+	col = sqrt(col);
+    
+	return fixed4( col, t );
 }
 
+fixed3 camPath( fixed time )
+{
+	return SC*1100.0*fixed3( cos(0.0+0.23*time), 0.0, cos(1.5+0.21*time) );
+}
+
+fixed3x3 setCamera( in fixed3 ro, in fixed3 ta, in fixed cr )
+{
+	fixed3 cw = normalize(ta-ro);
+	fixed3 cp = fixed3(sin(cr,sin(cr,sin(cr), cos(cr),0.0);
+	fixed3 cu = normalize( cross(cw,cp) );
+	fixed3 cv = normalize( cross(cu,cw) );
+    return fixed3x3( cu, cv, cw );
+}
+
+void moveCamera( fixed time, out fixed3 oRo, out fixed3 oTa, out fixed oCr, out fixed oFl )
+{
+	fixed3 ro = camPath( time );
+	fixed3 ta = camPath( time + 3.0 );
+	ro.y = terrainL( ro.xz ) + 19.0*SC;
+	ta.y = ro.y - 20.0*SC;
+	fixed cr = 0.2*cos(0.1*time);
+    oRo = ro;
+    oTa = ta;
+    oCr = cr;
+    oFl = 3.0;
+}
 
 
 
@@ -285,38 +368,42 @@ fixed DrawBubbles(fixed2 uv){
 	
             fixed4 ProcessFrag(v2f i)  {
                  
-    fixed hpPer = sin(_Time.y*0.2)*0.2+0.5;
-    fixed3 waterCol = fixed3(0.5,0.5,0.5)+fixed3(0.5,0.5,0.5)*cos(2.*PI*(fixed3(1.,0.5)+fixed3(0.5,0.5,0.5)*cos(2.*PI*(fixed3(1.,0.5)+fixed3(0.5,0.5,0.5)*cos(2.*PI*(fixed3(1.,1.,1.)*_Time.y*0.1+fixed3(0.,0.33,0.67)));
-    
-	fixed2 uv = (i.uv/1 - 0.5)*1/1*2.;
-    fixed3 col = fixed3(0.,0.,0.);//final color 
-	//draw 3D frame
-    col += DrawFrame(uv);
-    
-    //draw base water
-    fixed hpPerMask = step(0.,(hpPer *2. -1.)*SIZE - uv.y);
-  	fixed bgMask = 0.;
-    bgMask += PureCircle(uv,fixed2(0.,0.),SIZE*1.1,.9,0.9);
- 	bgMask += Circle(uv,fixed2(0.,0.),SIZE,.6)*0.2;
-    col += bgMask * waterCol *hpPerMask ;
-    
-    //draw wave
-    fixed waterMask = step(length(uv),SIZE);
-    fixed offset = hpPer -0.5+0.01;
-    fixed wavePicSize = 0.8*SIZE;
-    fixed2 remapUV = Within(uv,fixed4(0.,offset,wavePicSize,offset+wavePicSize-0.2));
-    fixed4 wave = SimpleWave3D(remapUV,waterCol);
-    col = lerp(col,wave.xyz*bgMask,wave.w*waterMask);
-	
-    //draw bubbles
-    fixed bubbleMask = smoothstep(0.,0.1,(hpPer *2. -1.2)*SIZE - uv.y);
-    col+= DrawBubbles(uv)*fixed3(1.,1.,1.)* bubbleMask*waterMask;
-    //draw hight light
-    col += DrawHightLight(uv*1.);
-    
-    return fixed4(col,1.0);
-    
+    fixed time = _Time.y*0.1 - 0.1 + 0.3 + 4.0*_iMouse.x/1;
 
+    // camera position
+    fixed3 ro, ta; fixed cr, fl;
+    moveCamera( time, ro, ta, cr, fl );
+
+    // camera2world transform    
+    fixed3x3 cam = setCamera( ro, ta, cr );
+
+    // pixel
+    fixed2 p = (-1 + 2.0*i.uv)/1;
+
+    fixed t = kMaxT;
+    fixed3 tot = fixed3(0.0,0.0,0.0);
+	#if AA>1
+    [unroll(100)]
+for( int m=0; m<AA; m++ )
+    [unroll(100)]
+for( int n=0; n<AA; n++ )
+    {
+        // pixel coordinates
+        fixed2 o = fixed2(fixed(m),fixed(n)) / fixed(AA) - 0.5;
+        fixed2 s = (-1 + 2.0*(i.uv+o))/1;
+	#else    
+        fixed2 s = p;
+	#endif
+
+        // camera ray    
+        fixed3 rd = cam * normalize(fixed3(s,fl));
+
+        fixed4 res = render( ro, rd );
+        t = min( t, res.w );
+ 
+        tot += res.xyz;
+	#if AA>1
+    
         
                 return fixed4(col, 1.0);
             }

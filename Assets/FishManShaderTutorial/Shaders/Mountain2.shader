@@ -284,17 +284,17 @@ Shader "FishManShaderTutorial/Shadertoy_Elevated"{
         
                     // rock
                     float r = tex2D( _NoiseTex, (7.0/SC)*pos.xz/256.0 ).x;
-                    //col = (r*0.25+0.75)*0.9*lerp( float3(0.08,0.05,0.03), float3(0.10,0.09,0.08), 
-                    //                             tex2D(_NoiseTex,0.00007*float2(pos.x,pos.y*48.0)/SC).x );
-                    //col = lerp( col, 0.20*float3(0.45,.30,0.15)*(0.50+0.50*r),smoothstep(0.70,0.9,nor.y) );
-                    //col = lerp( col, 0.15*float3(0.30,.30,0.10)*(0.25+0.75*r),smoothstep(0.95,1.0,nor.y) );
+                    col = (r*0.25+0.75)*0.9*lerp( float3(0.08,0.05,0.03), float3(0.10,0.09,0.08), 
+                                                 tex2D(_NoiseTex,0.00007*float2(pos.x,pos.y*48.0)/SC).x );
+                    col = lerp( col, 0.20*float3(0.45,.30,0.15)*(0.50+0.50*r),smoothstep(0.70,0.9,nor.y) );
+                    col = lerp( col, 0.15*float3(0.30,.30,0.10)*(0.25+0.75*r),smoothstep(0.95,1.0,nor.y) );
 
                     // snow
                     float h = smoothstep(55.0,80.0,pos.y/SC + 25.0*fbm(0.01*pos.xz/SC) );
                     float e = smoothstep(1.0-0.5*h,1.0-0.1*h,nor.y);
                     float o = 0.3 + 0.7*smoothstep(0.0,0.1,nor.x+h*h);
                     float s = h*e*o;
-                    //col = lerp( col, 0.29*float3(0.62,0.65,0.7), smoothstep( 0.1, 0.9, s ) );
+                    col = lerp( col, 0.29*float3(0.62,0.65,0.7), smoothstep( 0.1, 0.9, s ) );
         
                     // lighting     
                     float amb = clamp(0.5+0.5*nor.y,0.0,1.0);

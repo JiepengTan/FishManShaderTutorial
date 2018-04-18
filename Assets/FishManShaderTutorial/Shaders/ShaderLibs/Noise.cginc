@@ -139,10 +139,51 @@ float4 hash44(float4 p4)
     p4 += dot(p4, p4.wzxy+19.19);
     return frac((p4.xxyz+p4.yzzw)*p4.zywx);
 }
+#if defined(USING_PERLIN_NOISE) 
+	#define noise pnoise
+#elif defined(USING_VALUE_NOISE) 
+	#define noise vnoise
+	#undefine USING_TEXLOD_NOISE
+#elif defined(USING_SIMPLEX_NOISE) 
+	#define noise snoise
+#elif defined(USING_VNOISE) 
+	#define noise vnoise
+#else 
+	#define USING_TEXLOD_NOISE
+	#define noise vnoise
+#endif 
 
+// https://www.shadertoy.com/view/XdXBRH
+float pnoise( in float2 p )
+{
+    float2 i = floor( p );
+    float2 f = frac( p );
+	
+	float2 u = f*f*(3.0-2.0*f);
 
-// https://www.shadertoy.com/view/ldc3RB 
-// https://www.shadertoy.com/view/4sc3z2
+    return lerp( lerp( dot( hash22( i + float2(0.0,0.0) ), f - float2(0.0,0.0) ), 
+                     dot( hash22( i + float2(1.0,0.0) ), f - float2(1.0,0.0) ), u.x),
+                lerp( dot( hash22( i + float2(0.0,1.0) ), f - float2(0.0,1.0) ), 
+                     dot( hash22( i + float2(1.0,1.0) ), f - float2(1.0,1.0) ), u.x), u.y);
+}
+
+float pnoise( in float3 p )
+{
+    float3 i = floor( p );
+    float3 f = frac( p );
+	
+	float3 u = f*f*(3.0-2.0*f);
+
+    return lerp( lerp( lerp( dot( hash33( i + float3(0.0,0.0,0.0) ), f - float3(0.0,0.0,0.0) ), 
+                          dot( hash33( i + float3(1.0,0.0,0.0) ), f - float3(1.0,0.0,0.0) ), u.x),
+                     lerp( dot( hash33( i + float3(0.0,1.0,0.0) ), f - float3(0.0,1.0,0.0) ), 
+                          dot( hash33( i + float3(1.0,1.0,0.0) ), f - float3(1.0,1.0,0.0) ), u.x), u.y),
+                lerp( lerp( dot( hash33( i + float3(0.0,0.0,1.0) ), f - float3(0.0,0.0,1.0) ), 
+                          dot( hash33( i + float3(1.0,0.0,1.0) ), f - float3(1.0,0.0,1.0) ), u.x),
+                     lerp( dot( hash33( i + float3(0.0,1.0,1.0) ), f - float3(0.0,1.0,1.0) ), 
+                          dot( hash33( i + float3(1.0,1.0,1.0) ), f - float3(1.0,1.0,1.0) ), u.x), u.y), u.z );
+}
+
 
 
 // 带导数的noise的推导请参考Milo的 https://stackoverflow.com/questions/4297024/3d-perlin-noise-analytical-derivative
@@ -220,9 +261,11 @@ float4 noised( in float3 x )
 }
 
 
+
+
 #ifdef USING_TEXLOD_NOISE
 //IQ fast noise3D https://www.shadertoy.com/view/ldScDh
-float noise( in float3 x )
+float vnoise( in float3 x )
 {
     float3 p = floor(x);
     float3 f = frac(x);
@@ -233,7 +276,7 @@ float noise( in float3 x )
 }
 
 //IQ fast noise2D https://www.shadertoy.com/view/XsX3RB
-float noise( in float2 x )
+float vnoise( in float2 x )
 {
     float2 p = floor(x);
     float2 f = frac(x);
@@ -241,42 +284,7 @@ float noise( in float2 x )
 	float2 uv = p.xy+ + f.xy;
 	return tex2Dlod( _NoiseTex, float4((uv+0.5)/256.0, 0.,0.) ).x;
 } 
-/**/
-
 #else
-float noise(float2 p)
-{
-	float2 i = floor( p );
-	float2 f = frac( p );    
-	float2 u = f*f*(3.0-2.0*f);
-	return lerp(	lerp(	hash12( i + float2(0.0,0.0) ), 
-							hash12( i + float2(1.0,0.0) ), u.x),
-					lerp(	hash12( i + float2(0.0,1.0) ), 
-							hash12( i + float2(1.0,1.0) ), u.x), 
-					u.y);
-}
-
-
-float noise( in float3 x )
-{
-	float3 p = floor(x);
-	float3 f = frac(x);
-	f = f*f*(3.0-2.0*f);
-    
-	return lerp(lerp(lerp( hash13(p+float3(0,0,0)), 
-						hash13(p+float3(1,0,0)),f.x),
-					lerp( hash13(p+float3(0,1,0)), 
-						hash13(p+float3(1,1,0)),f.x),f.y),
-				lerp(lerp( hash13(p+float3(0,0,1)), 
-						hash13(p+float3(1,0,1)),f.x),
-					lerp( hash13(p+float3(0,1,1)), 
-						hash13(p+float3(1,1,1)),f.x),f.y),f.z);
-}
-
-#endif
-
-
-
 float vnoise(float2 p)
 {
     float2 pi = floor(p);
@@ -308,6 +316,7 @@ float vnoise(float3 p)
                     w.z),
                 w.y);
 }
+#endif
 
 
 float snoise(float2 p)

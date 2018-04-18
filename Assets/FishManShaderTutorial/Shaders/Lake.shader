@@ -13,6 +13,7 @@ Shader "FishManShaderTutorial/Lake" {
             ZTest Always Cull Off ZWrite Off
             CGPROGRAM
             float4 _LoopNum = float4(40.,128.,0.,0.);
+			//#define USING_PERLIN_NOISE
 #pragma vertex VertMergeRayMarch  
 #pragma fragment FragMergeRayMarch  
 #include "ShaderLibs/MergeRayMarch.cginc" 
@@ -32,7 +33,6 @@ Shader "FishManShaderTutorial/Lake" {
 			
 
 			float3 lightDir ;
-
 			float FBM( in float3 p ) {
 				float f = 0.0;
 				f += 0.5000*noise( p ); p = mul(m3,p)*2.02;
@@ -45,13 +45,20 @@ Shader "FishManShaderTutorial/Lake" {
 				return fbm( fixed3( pos.xz, ftime )) * 1;
 			}
 
-            float3 CalcNormal( in float3 pos, float t )
-            {
-                float3  eps = float3( 0.002*t, 0.0 ,0.);
-                return normalize( float3( WaterMap(pos-eps.xyz) - WaterMap(pos+eps.xyz),
-                                        2.0*eps.x,
-                                        WaterMap(pos-eps.yxz) - WaterMap(pos+eps.yxz) ) );
-            }
+			float3 WaterNormal(float3 pos,float rz){
+				float EPSILON = 0.01;
+				float3 dx = float3( EPSILON, 0.,0. );
+				float3 dz = float3( 0.,0., EPSILON );
+					
+				float3	normal = float3( 0., 1., 0. );
+				float bumpfactor = 0.2 * (1. - smoothstep( 0., 500, rz) );//根据距离所见Bump幅度
+				
+				normal.x = -bumpfactor * (WaterMap(pos + dx) - WaterMap(pos-dx) ) / (2. * EPSILON);
+				normal.z = -bumpfactor * (WaterMap(pos + dz) - WaterMap(pos-dz) ) / (2. * EPSILON);
+				return normalize( normal );	
+			}
+
+
 			float3 RayMarchCloud(float3 ro,float3 rd){
 				fixed3 col = fixed3(0.0,0.0,0.0);  
 				float sundot = clamp(dot(rd,lightDir),0.0,1.0);
@@ -75,16 +82,7 @@ Shader "FishManShaderTutorial/Lake" {
 				if(rd.y < -0.01 ) {
 					float rz = (-ro.y)/rd.y;
 					float3 pos = ro + rd * rz; 
-					float EPSILON = 0.01;
-					float3 dx = float3( EPSILON, 0.,0. );
-					float3 dz = float3( 0.,0., EPSILON );
-					float3	normal = float3( 0., 1., 0. );
-					float bumpfactor = 0.3 * (1. - smoothstep( 0., 500, rz) );//根据距离所见Bump幅度
-				
-					normal.x = -bumpfactor * (WaterMap(pos + dx) - WaterMap(pos-dx) ) / (2. * EPSILON);
-					normal.z = -bumpfactor * (WaterMap(pos + dz) - WaterMap(pos-dz) ) / (2. * EPSILON);
-					normal = normalize( normal );	
-					//float3 normal = CalcNormal(pos,rz);
+					float3 normal = WaterNormal(pos,rz);
 					float ndotr = dot(normal,-rd);
 					float fresnel = pow(1.0-abs(ndotr),6.);//计算 
 					float3 reflectRd = reflect( rd, normal);
