@@ -9,6 +9,7 @@ Shader "FishManShaderTutorial/HighlandLake" {
 		waterHeight ("waterHeight", float) =1.0
 		//lightDir ("lightDir", Vector) =(-0.8,0.4,-0.3,0.)
 		SC ("SC", float) =15
+		waterTranDeep ("waterTranDeep", float) =5
     }
     SubShader{ 
         Pass {
@@ -22,6 +23,8 @@ Shader "FishManShaderTutorial/HighlandLake" {
 			float3 _BaseWaterColor;
 			float3 _LightWaterColor;
 			sampler2D _TerrialHeigMap;
+			
+			float waterTranDeep = 5;
 			
 			float waterHeight = 4.;
 			#define lightDir (_WorldSpaceLightPos0.xyz)
@@ -59,7 +62,7 @@ Shader "FishManShaderTutorial/HighlandLake" {
 				float3 dz = float3( 0.,0., EPSILON );
 					
 				float3	normal = float3( 0., 1., 0. );
-				float bumpfactor = 0.3 * (1. - smoothstep( 0., 500, rz) );//根据距离所见Bump幅度
+				float bumpfactor = 0.3 * pow(1.-clamp((rz)/100.,0.,1.),6.);//根据距离所见Bump幅度
 				
 				normal.x = -bumpfactor * (WaterMap(pos + dx) - WaterMap(pos-dx) ) / (2. * EPSILON);
 				normal.z = -bumpfactor * (WaterMap(pos + dz) - WaterMap(pos-dz) ) / (2. * EPSILON);
@@ -83,11 +86,7 @@ Shader "FishManShaderTutorial/HighlandLake" {
                 col = lerp( col, 0.68*float3(0.4,0.65,1.0), pow( 1.0-max(rd.y,0.0), 16.0 ) );
 				return col;
 			}
-
-
 			float TerrainHigh( in float2 x ) {
-				//return (tex2Dlod( _NoiseTex,float4(p*0.000005 ,0.0,0.0)).x*600.);// * smoothstep( 820., 1000., length(p.xz) ) - 2.+ noise(p.xz*0.5)*15.;
-				//return FBM(p*0.005)*1000;
 				float2  p = x*0.003/SC;
                 float a = 0.0;
                 float b = 1.0;
@@ -96,9 +95,9 @@ Shader "FishManShaderTutorial/HighlandLake" {
                 {
                     float3 n = noised(p);
                     d += n.yz;
-                    a += b*n.x;///(1.0+dot(d,d));
+                    a += b*n.x;
                     b *= 0.5;
-                    p = p*2.0;//mul(m2,p)*2.0;
+                    p = p*2.0;
                 }
 
                 return SC*120.0*a;
@@ -179,16 +178,14 @@ Shader "FishManShaderTutorial/HighlandLake" {
 				col = lerp( col, fco, fo );
 				return col;
 			}
-			
-			
             float4 ProcessRayMarch(float2 uv,float3 ro,float3 rd,inout float sceneDep,float4 sceneCol){  
 				float maxT = 10000;
 				float minT = 0.1;
 				float3 col  = float3 (0.,0.,0.);
-			
+				float waterT = maxT;
 				if(rd.y <-0.01){
-					float t = -(ro.y - 50)/rd.y;
-					maxT = min(maxT,t);
+					float t = -(ro.y - waterHeight)/rd.y;
+					waterT = min(waterT,t);
 				}
 				float sundot = clamp(dot(rd,lightDir),0.0,1.0);
 
@@ -197,21 +194,25 @@ Shader "FishManShaderTutorial/HighlandLake" {
 				float3 refractCol = float3(0.,0.,0.);
 				bool reflected = false;
 				// hit the water
-				if(rz >= maxT && rd.y < -0.01){
-					rz = (-ro.y)/rd.y;
-					ro = ro + rd * rz; 
-					float3 nor = WaterNormal(ro,rz);
+				if(rz >= waterT && rd.y < -0.01){
+					float3 waterPos = ro + rd * waterT; 
+					float3 nor = WaterNormal(waterPos,waterT);
 					float ndotr = dot(nor,-rd);
 					fresnel = pow(1.0-abs(ndotr),6.);//计算 
-					rd = reflect( rd, nor);
 					float3 diff = pow(dot(nor,lightDir) * 0.4 + 0.6,3.);
 					// get the water col 
-					refractCol = _BaseWaterColor + diff * _LightWaterColor * 0.12; 
+					float3 waterCol = _BaseWaterColor + diff * _LightWaterColor * 0.12; 
+					float transPer = pow(1.0-clamp( rz - waterT,0,waterTranDeep)/waterTranDeep,3.);
+					float3 bgCol = RayMarchTerrial(ro,rd + nor* clamp(1.-dot(rd,-nor),0.,1.),rz);
+					refractCol = lerp(waterCol,bgCol,transPer);
+
+					ro = waterPos;
+					rd = reflect( rd, nor);
 					rz = InteresctTerrial(ro,rd,minT,maxT);
 					reflected = true;
 					col = refractCol;
 				}
-				if(rz > maxT){
+				if(rz >= maxT){
 					col = RayMarchCloud( ro, rd);
 				}else{
 					col = RayMarchTerrial(ro,rd,rz);
