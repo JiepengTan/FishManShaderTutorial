@@ -22,8 +22,8 @@ Shader "FishManShaderTutorial/Mountain" {
             
 
 
-            // value noise, and its analytical derivatives
-            float3 noiseds( in float2 x )
+            // value Noise, and its analytical derivatives
+            float3 Noiseds( in float2 x )
             {
                 float2 f = frac(x);
                 float2 u = f*f*(3.0-2.0*f);
@@ -52,7 +52,7 @@ Shader "FishManShaderTutorial/Mountain" {
                 //[unroll(100)]
                 for( int i=0; i<_LoopNum.x; i++ )
                 {
-                    float3 n = noiseds(p);
+                    float3 n = Noiseds(p);
                     d += n.yz;
                     a += b*n.x;///(1.0+dot(d,d));
                     b *= 0.5;
@@ -71,7 +71,7 @@ Shader "FishManShaderTutorial/Mountain" {
                 //[unroll(100)]
                 for( int i=0; i<_LoopNum.y ; i++ )
                 {
-                    float3 n = noiseds(p);
+                    float3 n = Noiseds(p);
                     d += n.yz;
                     a += b*n.x/(1.0+dot(d,d));
                     b *= 0.5;
@@ -89,7 +89,7 @@ Shader "FishManShaderTutorial/Mountain" {
                 //[unroll(100)] 
                 for( int i=0; i<_LoopNum.z; i++ )
                 {
-                    float3 n = noiseds(p);
+                    float3 n = Noiseds(p);
                     d += n.yz;
                     a += b*n.x/(1.0+dot(d,d));
                     b *= 0.5;

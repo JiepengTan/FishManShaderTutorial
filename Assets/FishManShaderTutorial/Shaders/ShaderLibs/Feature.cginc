@@ -3,6 +3,8 @@
 #define FMST_FEATURE
 
 #include "Common.cginc"
+#include "Noise.cginc"
+#include "FBM.cginc"
 
 float CausticRotateMin(float2 uv, float time){
 	float3x3 mat = float3x3(2,1,-2, 3,-2,1, 1,2,2);
@@ -41,7 +43,7 @@ float CausticVoronoi(float2 p,float time) {
 	float v = 0.0;
 	float a = 0.4;
 	for (int i = 0;i<3;i++) {
-		v+= wnoise(p,time)*a;
+		v+= WNoise(p,time)*a;
 		p*=2.0;
 		a*=0.5;
 	}
@@ -60,9 +62,9 @@ float3 Stars(in float3 rd,float den,float tileNum)
     {
         float3 q = frac(p*tileNum)-0.5;
         float3 id = floor(p*tileNum);
-        float2 rn = hash33(id).xy;
+        float2 rn = Hash33(id).xy;
 
-		float size = (hash13(id)*0.2+0.8)*SIZE; 
+		float size = (Hash13(id)*0.2+0.8)*SIZE; 
 		float demp = pow(1.-size/SIZE,.8)*0.45;
 		float val = (sin(_Time.y*31.*size)*demp+1.-demp) * size;
         float c2 = 1.-smoothstep(0.,val,length(q));//»­Ô²
@@ -112,7 +114,7 @@ fixed3 Fog(in fixed3 bgCol, in fixed3 ro, in fixed3 rd, in fixed maxT,
 		// get height desity 
 		float hDen = (1.-smoothstep(heightRange.x,heightRange.y,p.y));
 		// get final  density
-		fixed den = tnoise(p*2.2/(d+20.),ftime, 0.2)* hDen;
+		fixed den = TNoise(p*2.2/(d+20.),ftime, 0.2)* hDen;
 		fixed3 col2 = fogCol *( den *0.5+0.5);
 		col = lerp(col,col2,clamp(den*smoothstep(d-0.4,d+2.+d*.75,maxT),0.,1.) );
 		d *= 1.5+0.3; 

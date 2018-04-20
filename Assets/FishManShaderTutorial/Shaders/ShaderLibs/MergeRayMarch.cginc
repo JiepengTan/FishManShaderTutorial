@@ -1,5 +1,5 @@
 // Motion vector shader for Skinner Particle
-#include "Common.cginc"
+#include "FBM.cginc"
 #include "Feature.cginc"
 
 sampler2D _MainTex;

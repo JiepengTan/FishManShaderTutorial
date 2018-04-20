@@ -20,11 +20,11 @@ Shader "FishManShaderTutorial/Cloud2" {
 			{
 				fixed3 q = p;// - fixed3(0.0,0.1,1.0)*_Time.y;
 				fixed f;
-				f  = 0.50000*noise( q ); q = q*2.02;
-				f += 0.25000*noise( q ); q = q*2.03;
-				f += 0.12500*noise( q ); q = q*2.01;
-				f += 0.06250*noise( q ); q = q*2.02;
-				f += 0.03125*noise( q );
+				f  = 0.50000*Noise( q ); q = q*2.02;
+				f += 0.25000*Noise( q ); q = q*2.03;
+				f += 0.12500*Noise( q ); q = q*2.01;
+				f += 0.06250*Noise( q ); q = q*2.02;
+				f += 0.03125*Noise( q );
 				return clamp( 1.5 - p.y - 2.0 + 1.75*f, 0.0, 1.0 );
 			}
 
@@ -32,27 +32,27 @@ Shader "FishManShaderTutorial/Cloud2" {
 			{
 				fixed3 q = p;// - fixed3(0.0,0.1,1.0)*_Time.y;
 				fixed f;
-				f  = 0.50000*noise( q ); q = q*2.02;
-				f += 0.25000*noise( q ); q = q*2.03;
-				f += 0.12500*noise( q ); q = q*2.01;
-				f += 0.06250*noise( q );
+				f  = 0.50000*Noise( q ); q = q*2.02;
+				f += 0.25000*Noise( q ); q = q*2.03;
+				f += 0.12500*Noise( q ); q = q*2.01;
+				f += 0.06250*Noise( q );
 				return clamp( 1.5 - p.y - 2.0 + 1.75*f, 0.0, 1.0 );
 			}
 			fixed map3( in fixed3 p )
 			{
 				fixed3 q = p ;//- fixed3(0.0,0.1,1.0)*_Time.y;
 				fixed f;
-				f  = 0.50000*noise( q ); q = q*2.02;
-				f += 0.25000*noise( q ); q = q*2.03;
-				f += 0.12500*noise( q );
+				f  = 0.50000*Noise( q ); q = q*2.02;
+				f += 0.25000*Noise( q ); q = q*2.03;
+				f += 0.12500*Noise( q );
 				return clamp( 1.5 - p.y - 2.0 + 1.75*f, 0.0, 1.0 );
 			}
 			fixed map2( in fixed3 p )
 			{
 				fixed3 q = p;// - fixed3(0.0,0.1,1.0)*_Time.y;
 				fixed f;
-				f  = 0.50000*noise( q ); q = q*2.02;
-				f += 0.25000*noise( q );;
+				f  = 0.50000*Noise( q ); q = q*2.02;
+				f += 0.25000*Noise( q );;
 				return clamp( 1.5 - p.y - 2.0 + 1.75*f, 0.0, 1.0 );
 			}
 

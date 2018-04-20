@@ -11,17 +11,17 @@ Shader "FishManShaderTutorial/Desert" {
 #pragma vertex VertMergeRayMarch  
 #pragma fragment FragMergeRayMarch  
 #include "ShaderLibs/MergeRayMarch.cginc"
-            // value noise, and its analytical derivatives
+            // value Noise, and its analytical derivatives
     	/*	*/
 			float terrainH( in float2 p)
 			{
 				//middle
-				float valM = noise(p * 0.26) + 0.5;//0~1
+				float valM = Noise(p * 0.26) + 0.5;//0~1
 				valM = 1.0 - abs(valM - 0.5) * 2.0;
 				valM = pow(valM,2.0);
     
 				//big
-				float valB = smoothstep(0.0,1.0,noise(p * 0.2) + 0.5);//0~1
+				float valB = smoothstep(0.0,1.0,Noise(p * 0.2) + 0.5);//0~1
 				float val =  valB * 0.8 +valM * 0.19*pow(valB,2.0) ;
 				return val * _LoopNum.z;
 			}

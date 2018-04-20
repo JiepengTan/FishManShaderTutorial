@@ -153,12 +153,12 @@
 			//晶格化
 			//distFactor = step(0.1, distFactor);
 
-			//cell noise 
-			float4 noiseCellIntensity = GpuGetCell3D(worldPos).r;
+			//cell Noise 
+			float4 NoiseCellIntensity = GpuGetCell3D(worldPos).r;
 			
 			fixed4 finalColor = tex2D(_MainTex, i.mainUV);
 			finalColor.rgb = finalColor.rgb 
-				+ distFactor * (noiseCellIntensity * _NoiseCellColor  + tileIntensity *_TileColor   + edgeIntensity * _EdgeColor) * _RingIntensity;
+				+ distFactor * (NoiseCellIntensity * _NoiseCellColor  + tileIntensity *_TileColor   + edgeIntensity * _EdgeColor) * _RingIntensity;
 	
 			//return _MainTex_TexelSize.y;
 			return finalColor;

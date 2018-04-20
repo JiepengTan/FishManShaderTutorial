@@ -1,5 +1,5 @@
 ﻿// create by JiepengTan 2018-04-13  email: jiepengtan@gmail.com
-Shader "FishManShaderTutorial/Mountain" {
+Shader "FishManShaderTutorial/Sky" {
     Properties{
         _MainTex("Base (RGB)", 2D) = "white" {}
     }
@@ -13,7 +13,7 @@ Shader "FishManShaderTutorial/Mountain" {
 #include "ShaderLibs/Feature.cginc"
 #include "ShaderLibs/MergeRayMarch.cginc"
 
-			
+
             float4 ProcessRayMarch(float2 uv,float3 ro,float3 rd,inout float sceneDep,float4 sceneCol)  {
                 fixed3 col = fixed3(0.0,0.0,0.0);  
 				float3 light1 = normalize( float3(-0.8,0.4,-0.3) );

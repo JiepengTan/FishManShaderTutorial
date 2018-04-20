@@ -34,7 +34,7 @@ public static class NoiseTools {
     static Vector3 HASHSCALE3 = new Vector3(.1031f, .1030f, .0973f);
     static Vector4 HASHSCALE4 = new Vector4(.1031f, .1030f, .0973f, .1099f);
 
-    static Vector2 hash22(Vector2 p) {
+    static Vector2 Hash22(Vector2 p) {
         Vector3 val = new Vector3(p.x, p.y, p.x);
         Vector3 p3 = frac(Vector3.Scale(val, HASHSCALE3));
         Vector3 val2 = new Vector3(p3.y, p3.z, p3.x);// p3.yzx
@@ -171,16 +171,16 @@ public static class NoiseTools {
         return a + t * (b - a);
     }
 
-    static float Grad(int hash, float x) {
-        return (hash & 1) == 0 ? x : -x;
+    static float Grad(int Hash, float x) {
+        return (Hash & 1) == 0 ? x : -x;
     }
 
-    static float Grad(int hash, float x, float y) {
-        return ((hash & 1) == 0 ? x : -x) + ((hash & 2) == 0 ? y : -y);
+    static float Grad(int Hash, float x, float y) {
+        return ((Hash & 1) == 0 ? x : -x) + ((Hash & 2) == 0 ? y : -y);
     }
 
-    static float Grad(int hash, float x, float y, float z) {
-        var h = hash & 15;
+    static float Grad(int Hash, float x, float y, float z) {
+        var h = Hash & 15;
         var u = h < 8 ? x : y;
         var v = h < 4 ? y : (h == 12 || h == 14 ? x : z);
         return ((h & 1) == 0 ? u : -u) + ((h & 2) == 0 ? v : -v);

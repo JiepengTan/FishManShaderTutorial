@@ -17,17 +17,17 @@ using UnityEditor;
 
     [MenuItem("Tool/CreateTerrialMap")]
     public static void CreateWhiteNoiseTex() {
-        FastNoise fn = new FastNoise();
-        
-        Color[] colors = new Color[wid * hei];
-        for (int i = 0; i < hei; i++) {
-            for (int j = 0; j < wid; j++) {
-                var val = fn.GetPerlinFractal(i, j); ;
-                colors[i * wid + j].r = val;
-                colors[i * wid + j].a = 1.0f;
-            }
-        }
-        SaveToPic(colors, TerrialMapTexPath);
+        //FastNoise fn = new FastNoise();
+        //
+        //Color[] colors = new Color[wid * hei];
+        //for (int i = 0; i < hei; i++) {
+        //    for (int j = 0; j < wid; j++) {
+        //        var val = fn.GetPerlinFractal(i, j); ;
+        //        colors[i * wid + j].r = val;
+        //        colors[i * wid + j].a = 1.0f;
+        //    }
+        //}
+        //SaveToPic(colors, TerrialMapTexPath);
     }
 
     static void SaveToPic(Color[] colors, string relPath) {

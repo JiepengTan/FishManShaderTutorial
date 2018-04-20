@@ -22,7 +22,7 @@ Shader "FishManShaderTutorial/Cloud" {
                 float a = .35;
                 for (int i = 0; i<2; i++)
                 { 
-                    rz += noise(x)*a;  
+                    rz += Noise(x)*a;  
                     a*=.35;
                     x*= 4.;
                 }
@@ -100,7 +100,7 @@ Shader "FishManShaderTutorial/Cloud" {
                 float2 pds = p*(length(p))*0.75;
                 float a = atan2(q.y,q.x);
     
-                float rz = .55*(pow(abs(frac(a*.8+.12)-0.5),3.)*(hash11(a*15.)*0.9+.1)*exp2((-dot(q,q)*4.))); //Spokes
+                float rz = .55*(pow(abs(frac(a*.8+.12)-0.5),3.)*(Hash11(a*15.)*0.9+.1)*exp2((-dot(q,q)*4.))); //Spokes
     
                 rz += max(1.0/(1.0+32.0*pent(pds+0.8*pos)),.0)*00.2; //Projected ghost (main lens)
                 float2 p2 = lerp(p,pds,-.5); //Reverse distort

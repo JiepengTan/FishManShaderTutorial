@@ -65,7 +65,7 @@ Shader "FishManShaderTutorial/Sea2" {
 
 			// sea
 			float sea_octave(float2 uv, float choppy) {
-				uv += noise(uv);        
+				uv += Noise(uv);        
 				float2 wv = 1.0-abs(sin(uv));
 				float2 swv = abs(cos(uv));    
 				wv = lerp(wv,swv,wv);

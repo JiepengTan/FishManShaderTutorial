@@ -64,15 +64,15 @@ Shader "FishManShaderTutorial/Ripple"
                 o.uv = TRANSFORM_TEX(v.uv, _MainTex);
                 return o;
             }
-			float hash12(float2 co){
+			float Hash12(float2 co){
 				return frac(sin(co.x*157.1147 + co.y*13.713) * 43751.1353);
 			}
-			fixed2 hash22(fixed2 co){
+			fixed2 Hash22(fixed2 co){
 				fixed x = frac(sin(dot(co.xy ,fixed2(1232.9898,7183.233))) * 43758.5453);
 				fixed y = frac(sin(dot(co.xy ,fixed2(4577.6537,5337.2793))) * 37573.5913);
 				return fixed2(x,y);
 			}
-			float2 hash21(float co){
+			float2 Hash21(float co){
 				fixed x = frac(sin(co*57.2793) * 438.5453);
 				fixed y = frac(sin(co*47.6537) * 373.5453);
 				return fixed2(x,y);
@@ -101,13 +101,13 @@ Shader "FishManShaderTutorial/Ripple"
                     for (float i = -crossGridNum; i <= crossGridNum; ++i)
                     {
                         float2 pi = p0 + float2(i, j);
-                        float2 hsh = hash22(pi);
-                        float pd = period*(hash12(hsh) + 1.);
-                        float time = iTime+pd*hash12(pi);
+                        float2 hsh = Hash22(pi);
+                        float pd = period*(Hash12(hsh) + 1.);
+                        float time = iTime+pd*Hash12(pi);
                         float t = modf(time,pd);
-                        float2 p = pi + hash22(hsh + hash21(floor(time/pd)));
+                        float2 p = pi + Hash22(hsh + Hash21(floor(time/pd)));
             
-                        float lifeTime = (hash12(hash22(hsh)) * 0.8+ 0.2)* mP;
+                        float lifeTime = (Hash12(Hash22(hsh)) * 0.8+ 0.2)* mP;
                         float decay =pow(max(0.,lifeTime - t)/lifeTime,decaySpd);
                         float amp = (lifeTime / period) * waveHei;
             

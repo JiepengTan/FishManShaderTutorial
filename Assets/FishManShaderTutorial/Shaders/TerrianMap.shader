@@ -1,10 +1,16 @@
 ﻿// create by JiepengTan 2018-04-12  email: jiepengtan@gmail.com
-Shader "FishManShaderTutorial/Voronoi"
+// all right reserve
+// the base idea is come from https://www.shadertoy.com/view/ldfyzl
+Shader "FishManShaderTutorial/Ripple"
 {
     Properties
     {
         _MainTex ("Texture", 2D) = "white" {}
-        _TileNum ("TileNum", float) = 5
+		_Color ("color", Color) = (.34, .85, .92, 1) // color
+        crossGridNum ("crossGridNum", float) = 1.//Maximum number of cells a ripple can cross.
+        _Precision ("_Precision", float) = 1.//peroid
+        _High ("_High", float) = 2.//wave move speed
+
     }
 
     SubShader
@@ -18,7 +24,7 @@ Shader "FishManShaderTutorial/Voronoi"
             #pragma vertex vert
             #pragma fragment frag
             #include "UnityCG.cginc"
-			#include "ShaderLibs/Noise.cginc"
+            //#include "ShaderLibs/Noise.cginc"
             struct appdata
             {
                 float4 vertex : POSITION;
@@ -33,9 +39,8 @@ Shader "FishManShaderTutorial/Voronoi"
 			
             sampler2D _MainTex;
             float4 _MainTex_ST;
-            float _TileNum ; 
-
-			#define HASHSCALE3 float3(.1031, .1030, .0973)
+			float _Precision;
+			float _High;
 
             v2f vert (appdata v)
             {
@@ -44,15 +49,14 @@ Shader "FishManShaderTutorial/Voronoi"
                 o.uv = TRANSFORM_TEX(v.uv, _MainTex);
                 return o;
             }
-		
             fixed4 frag (v2f i) : SV_Target
             {
-				float2 uv = _TileNum * i.uv;
-				float time = _Time.y;
-				float val = WNoise(uv,time);
-				
-                return float4(val,val,val,1.0);
-            }			
+				float2 uv = i.uv * float2(_ScreenParams.x/_ScreenParams.y,1.0);
+                // sample the texture
+         
+                return float4(col,1.0);
+					/**/
+            }
             ENDCG
         }
     }

@@ -35,10 +35,10 @@ Shader "FishManShaderTutorial/Lake" {
 			float3 lightDir ;
 			float FBM( in float3 p ) {
 				float f = 0.0;
-				f += 0.5000*noise( p ); p = mul(m3,p)*2.02;
-				f += 0.2500*noise( p ); p = mul(m3,p)*2.03;
-				f += 0.1250*noise( p ); p = mul(m3,p)*2.01; 
-				f += 0.0625*noise( p );
+				f += 0.5000*Noise( p ); p = mul(m3,p)*2.02;
+				f += 0.2500*Noise( p ); p = mul(m3,p)*2.03;
+				f += 0.1250*Noise( p ); p = mul(m3,p)*2.01; 
+				f += 0.0625*Noise( p );
 				return f/0.9375;
 			}
 			float WaterMap( fixed3 pos ) {

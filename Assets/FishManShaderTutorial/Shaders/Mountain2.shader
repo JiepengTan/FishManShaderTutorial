@@ -88,8 +88,8 @@ Shader "FishManShaderTutorial/Shadertoy_Elevated"{
 
 
 
-            // value noise, and its analytical derivatives
-            float3 noised( in float2 x )
+            // value Noise, and its analytical derivatives
+            float3 Noised( in float2 x )
             {
                 float2 f = frac(x);
                 float2 u = f*f*(3.0-2.0*f);
@@ -118,7 +118,7 @@ Shader "FishManShaderTutorial/Shadertoy_Elevated"{
                 //[unroll(100)]
                 for( int i=0; i<_LoopNum.x; i++ )
                 {
-                    float3 n = noised(p);
+                    float3 n = Noised(p);
                     d += n.yz;
                     a += b*n.x;///(1.0+dot(d,d));
                     b *= 0.5;
@@ -137,7 +137,7 @@ Shader "FishManShaderTutorial/Shadertoy_Elevated"{
                 //[unroll(100)]
                 for( int i=0; i<_LoopNum.y ; i++ )
                 {
-                    float3 n = noised(p);
+                    float3 n = Noised(p);
                     d += n.yz;
                     a += b*n.x/(1.0+dot(d,d));
                     b *= 0.5;
@@ -155,7 +155,7 @@ Shader "FishManShaderTutorial/Shadertoy_Elevated"{
                 //[unroll(100)] 
                 for( int i=0; i<_LoopNum.z; i++ )
                 {
-                    float3 n = noised(p);
+                    float3 n = Noised(p);
                     d += n.yz;
                     a += b*n.x/(1.0+dot(d,d));
                     b *= 0.5;
@@ -385,7 +385,7 @@ Shader "FishManShaderTutorial/Shadertoy_Elevated"{
                 
                 float4 res = render( ro, rd );
                 float3 val = float3(0.0,0.0,0.0);
-                //val = noised(p);
+                //val = Noised(p);
                 //val = float3(fbm(p),fbm(p),fbm(p));
                 //val = length(p);
                 val = res.xyz;

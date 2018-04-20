@@ -20,7 +20,7 @@ Shader "FishManShaderTutorial/Fog" {
 #pragma vertex VertMergeRayMarch  
 #pragma fragment FragMergeRayMarch  
 #include "ShaderLibs/MergeRayMarch.cginc" 
-            // value noise, and its analytical derivatives
+            // value Noise, and its analytical derivatives
     				/*	*/
 			#define ITR 100 
 			#define FAR 30.

@@ -28,7 +28,7 @@
 #pragma vertex VertMergeRayMarch  
 #pragma fragment FragMergeRayMarch  
 #include "ShaderLibs/MergeRayMarch.cginc"
-            // value noise, and its analytical derivatives
+            // value Noise, and its analytical derivatives
     	        
 			// lighting
 			float diffuse(float3 n,float3 l,float p) {
@@ -47,7 +47,7 @@
 
 			// sea
 			float sea_octave(float2 uv, float choppy) {
-				uv += noise(uv);        
+				uv += Noise(uv);        
 				float2 wv = 1.0-abs(sin(uv));
 				float2 swv = abs(cos(uv));    
 				wv = lerp(wv,swv,wv);

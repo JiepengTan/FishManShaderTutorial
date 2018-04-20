@@ -17,7 +17,9 @@ public class ShowFPS : MonoBehaviour {
     }
 
     // Use this for initialization  
+    GUIStyle style;
     void Start() {
+        style = new GUIStyle();
         m_LastUpdateShowTime = Time.realtimeSinceStartup;
     }
 
@@ -30,10 +32,9 @@ public class ShowFPS : MonoBehaviour {
             m_LastUpdateShowTime = Time.realtimeSinceStartup;
         }
     }
-    public int fontSize = 30;
+    public int fontSizeRel = 15;
     void OnGUI() {
-        var style = new GUIStyle();
-        style.fontSize = fontSize;
+        style.fontSize = fontSizeRel;
         GUI.Label(new Rect(0, 0, 300, 300), "FPS: " + m_FPS, style);
     }
 }

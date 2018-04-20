@@ -5,7 +5,6 @@ Shader "FishManShaderTutorial/HighlandLake" {
 		_LoopNum ("_LoopNum", Vector) = (40.,128., 1, 1)
 		_BaseWaterColor ("_BaseWaterColor", COLOR) = (.025, .2, .125,0.)
 		_LightWaterColor ("_LightWaterColor", COLOR) = (.025, .2, .125,0.)
-		_TerrialHeigMap("_TerrialHeigMap", 2D) = "white" {}
 		waterHeight ("waterHeight", float) =1.0
 		//lightDir ("lightDir", Vector) =(-0.8,0.4,-0.3,0.)
 		SC ("SC", float) =15
@@ -22,7 +21,6 @@ Shader "FishManShaderTutorial/HighlandLake" {
 			
 			float3 _BaseWaterColor;
 			float3 _LightWaterColor;
-			sampler2D _TerrialHeigMap;
 			
 			float waterTranDeep = 5;
 			
@@ -34,26 +32,8 @@ Shader "FishManShaderTutorial/HighlandLake" {
 										 -0.80,  0.36, -0.48,
 										 -0.60, -0.48,  0.64 );
 
-			float FBM( in float3 p ) {
-				float f = 0.0;
-				f += 0.5000*noise( p ); p = mul(m3,p)*2.02;
-				f += 0.2500*noise( p ); p = mul(m3,p)*2.03;
-				f += 0.1250*noise( p ); p = mul(m3,p)*2.01; 
-				f += 0.0625*noise( p );
-				return f/0.9375;
-			}
-
-			float FBM( in float2 p ) {
-				float f = 0.0;
-				f += 0.5000*noise( p ); p = mul(m2,p)*2.02;
-				f += 0.2500*noise( p ); p = mul(m2,p)*2.03;
-				f += 0.1250*noise( p ); p = mul(m2,p)*2.01; 
-				f += 0.0625*noise( p );
-				return f/0.9375;
-			}
-
 			float WaterMap( fixed3 pos ) {
-				return fbm( fixed3( pos.xz, ftime )) * 1;
+				return FBM( fixed3( pos.xz, ftime )) * 1;
 			}
 
 			float3 WaterNormal(float3 pos,float rz){
@@ -93,7 +73,7 @@ Shader "FishManShaderTutorial/HighlandLake" {
                 float2  d = float2(0.0,0.0);
                 for( int i=0; i<9; i++ )
                 {
-                    float3 n = noised(p);
+                    float3 n = Noised(p);
                     d += n.yz;
                     a += b*n.x;
                     b *= 0.5;
@@ -102,7 +82,6 @@ Shader "FishManShaderTutorial/HighlandLake" {
 
                 return SC*120.0*a;
 			}
-
 
 			float InteresctTerrial( in float3 ro, in float3 rd, in float tmin, in float tmax )
             {
@@ -113,7 +92,7 @@ Shader "FishManShaderTutorial/HighlandLake" {
                     float h = p.y - TerrainHigh( p.xz );
                     if( h<(0.002*t) || t>tmax ) break;
                     t += 0.5*h;
-                }
+                } 
                 return t; 
             }
 			float SoftShadow(in float3 ro, in float3 rd )
@@ -219,8 +198,7 @@ Shader "FishManShaderTutorial/HighlandLake" {
 				}
 				if( reflected == true ) {
 					col = lerp(refractCol,col,fresnel);
-					float nrm = (60. + 8.0) / (PI * 8.0);
-					float spec=  pow(max(dot(rd,lightDir),0.0),128.) * nrm;
+					float spec=  pow(max(dot(rd,lightDir),0.0),128.) * 3.;
 					col += float3(spec,spec,spec);
 				}
 				
