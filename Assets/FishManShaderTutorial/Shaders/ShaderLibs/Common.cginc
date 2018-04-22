@@ -4,6 +4,6 @@
 
 #include "UnityCG.cginc"
 
-#define ftime _Time.y
+#define ftime (_Time.y)
 
 #endif // FMST_COMMOM

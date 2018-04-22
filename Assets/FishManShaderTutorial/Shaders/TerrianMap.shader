@@ -53,7 +53,7 @@ Shader "FishManShaderTutorial/Ripple"
             {
 				float2 uv = i.uv * float2(_ScreenParams.x/_ScreenParams.y,1.0);
                 // sample the texture
-         
+				float3 col = float3(0.,0.,0.);
                 return float4(col,1.0);
 					/**/
             }
