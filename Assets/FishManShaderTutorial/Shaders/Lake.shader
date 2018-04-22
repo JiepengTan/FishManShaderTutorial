@@ -14,9 +14,9 @@ Shader "FishManShaderTutorial/Lake" {
             CGPROGRAM
             float4 _LoopNum = float4(40.,128.,0.,0.);
 			//#define USING_PERLIN_NOISE
-#pragma vertex VertMergeRayMarch  
-#pragma fragment FragMergeRayMarch  
-#include "ShaderLibs/MergeRayMarch.cginc" 
+#pragma vertex vert  
+#pragma fragment frag  
+#include "ShaderLibs/Framework3D.cginc" 
 			
 			float3 _BaseWaterColor;
 			float3 _LightWaterColor;

@@ -9,9 +9,9 @@ Shader "FishManShaderTutorial/Mountain" {
             ZTest Always Cull Off ZWrite Off
             CGPROGRAM
             float4 _LoopNum;
-#pragma vertex VertMergeRayMarch  
-#pragma fragment FragMergeRayMarch  
-#include "ShaderLibs/MergeRayMarch.cginc"
+#pragma vertex vert  
+#pragma fragment frag  
+#include "ShaderLibs/Framework3D.cginc"
 
      
             #define AA 1   // make this 2 or even 3 if you have a really powerful GPU

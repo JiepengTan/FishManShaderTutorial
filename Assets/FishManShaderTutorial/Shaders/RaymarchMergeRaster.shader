@@ -10,10 +10,10 @@ Shader "FishManShaderTutorial/RaymarchMergeRaster" {
             ZTest Always Cull Off ZWrite Off
             CGPROGRAM
 
-#pragma vertex VertMergeRayMarch   
-#pragma fragment FragMergeRayMarch  
+#pragma vertex vert   
+#pragma fragment frag  
 #include "ShaderLibs/Feature.cginc"
-#include "ShaderLibs/MergeRayMarch.cginc"
+#include "ShaderLibs/Framework3D.cginc"
 
 			#define SPHERE_ID (1.0)
 			#define FLOOR_ID (2.0)

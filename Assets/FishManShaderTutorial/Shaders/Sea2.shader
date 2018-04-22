@@ -28,9 +28,9 @@ Shader "FishManShaderTutorial/Sea2" {
 // 是否使用Noise 贴图来加速
 //#define USING_TEXLOD_NOISE 
 
-#pragma vertex VertMergeRayMarch  
-#pragma fragment FragMergeRayMarch  
-#include "ShaderLibs/MergeRayMarch.cginc"
+#pragma vertex vert  
+#pragma fragment frag  
+#include "ShaderLibs/Framework3D.cginc"
 
 			const int NUM_STEPS = 8;
 			const float EPSILON = 1e-3;

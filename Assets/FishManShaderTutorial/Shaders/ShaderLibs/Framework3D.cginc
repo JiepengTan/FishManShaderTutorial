@@ -14,7 +14,7 @@ struct v2f {
 	float4 interpolatedRay : TEXCOORD2;
 };
 
-v2f VertMergeRayMarch(appdata_img v) {
+v2f vert(appdata_img v) {
 	v2f o;
 	o.pos = UnityObjectToClipPos(v.vertex);
 
@@ -49,7 +49,7 @@ v2f VertMergeRayMarch(appdata_img v) {
 }
 
 float4 ProcessRayMarch(float2 uv,float3 ro,float3 rd,inout float sceneDep,float4 sceneCol);
-float4 FragMergeRayMarch(v2f i) : SV_Target{
+float4 frag(v2f i) : SV_Target{
 	float depth = LinearEyeDepth(SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, i.uv_depth));
 	depth *= length(i.interpolatedRay.xyz);
 	fixed4 sceneCol = tex2D(_MainTex, i.uv);

@@ -8,9 +8,9 @@ Shader "FishManShaderTutorial/Desert" {
             ZTest Always Cull Off ZWrite Off
             CGPROGRAM
             float4 _LoopNum = float4(40.,128.,0.,0.);
-#pragma vertex VertMergeRayMarch  
-#pragma fragment FragMergeRayMarch  
-#include "ShaderLibs/MergeRayMarch.cginc"
+#pragma vertex vert  
+#pragma fragment frag  
+#include "ShaderLibs/Framework3D.cginc"
             // value Noise, and its analytical derivatives
     	/*	*/
 			float terrainH( in float2 p)

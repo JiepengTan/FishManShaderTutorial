@@ -17,9 +17,9 @@ Shader "FishManShaderTutorial/Fog" {
 			float2 _FogHighRange;
 			fixed3 _FogCol;
 			 
-#pragma vertex VertMergeRayMarch  
-#pragma fragment FragMergeRayMarch  
-#include "ShaderLibs/MergeRayMarch.cginc" 
+#pragma vertex vert  
+#pragma fragment frag  
+#include "ShaderLibs/Framework3D.cginc" 
             // value Noise, and its analytical derivatives
     				/*	*/
 			#define ITR 100 

@@ -13,9 +13,9 @@ Shader "FishManShaderTutorial/Sea" {
             CGPROGRAM
 
 
-#pragma vertex VertMergeRayMarch  
-#pragma fragment FragMergeRayMarch  
-#include "ShaderLibs/MergeRayMarch.cginc"
+#pragma vertex vert  
+#pragma fragment frag  
+#include "ShaderLibs/Framework3D.cginc"
 
 			float3 _SeaBaseColor;
 			float3 _SeaWaterColor;

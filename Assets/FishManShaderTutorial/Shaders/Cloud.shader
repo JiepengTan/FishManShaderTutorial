@@ -9,9 +9,9 @@ Shader "FishManShaderTutorial/Cloud" {
             ZTest Always Cull Off ZWrite Off
             CGPROGRAM
             #define USING_TEXLOD_NOISE 1
-#pragma vertex VertMergeRayMarch  
-#pragma fragment FragMergeRayMarch  
-#include "ShaderLibs/MergeRayMarch.cginc"
+#pragma vertex vert  
+#pragma fragment frag  
+#include "ShaderLibs/Framework3D.cginc"
 
             float4 _LoopNum ;
             float moy = 0.;
