@@ -8,6 +8,9 @@
 #define Radius2Deg 180./PI
 
 
+#define _m2 (float2x2(0.8,-0.6,0.6,0.8))
+#define _m3 (float3x3( 0.00,  0.80,  0.60, -0.80,  0.36, -0.48, -0.60, -0.48,  0.64 ))
+
 float3x3 Rotx(fixed a){a*= Radius2Deg; fixed sa = sin(a); fixed ca = cos(a); return float3x3(1.,.0,.0,    .0,ca,sa,   .0,-sa,ca);}
 float3x3 Roty(fixed a){a*= Radius2Deg; fixed sa = sin(a); fixed ca = cos(a); return float3x3(ca,.0,sa,    .0,1.,.0,   -sa,.0,ca);}
 float3x3 Rotz(fixed a){a*= Radius2Deg; fixed sa = sin(a); fixed ca = cos(a); return float3x3(ca,sa,.0,    -sa,ca,.0,  .0,.0,1.); }

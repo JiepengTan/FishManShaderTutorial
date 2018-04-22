@@ -232,7 +232,7 @@ float3 _tri3(in float3 p){return float3(_tri(p.z+_tri(p.y*1.)), _tri(p.z+_tri(p.
 
 float TNoise(float2 p,float time,float spd)
 {
-	const float2x2 _m2 = float2x2( 0.970,  0.242, -0.242,  0.970 );
+	const float2x2 m2 = float2x2( 0.970,  0.242, -0.242,  0.970 );
     float z=1.5;
 	float rz = 0.;
     float2 bp = p;

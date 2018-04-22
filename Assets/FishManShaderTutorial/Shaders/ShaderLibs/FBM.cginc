@@ -5,7 +5,6 @@
 
 #include "Noise.cginc"
 
-const float2x2 _FBM_M2 = float2x2( 0.80,  0.60, -0.60,  0.80 );
 
 float FBM( float2 p )
 {
@@ -36,10 +35,10 @@ float FBMR( float2 p )
 {
     float f = 0.0;
 
-    f += 0.50000*Noise( p ); p = mul(_FBM_M2,p)*2.02;
-    f += 0.25000*Noise( p ); p = mul(_FBM_M2,p)*2.03;
-    f += 0.12500*Noise( p ); p = mul(_FBM_M2,p)*2.01;
-    f += 0.06250*Noise( p ); p = mul(_FBM_M2,p)*2.04;
+    f += 0.50000*Noise( p ); p = mul(_m2,p)*2.02;
+    f += 0.25000*Noise( p ); p = mul(_m2,p)*2.03;
+    f += 0.12500*Noise( p ); p = mul(_m2,p)*2.01;
+    f += 0.06250*Noise( p ); p = mul(_m2,p)*2.04;
     f += 0.03125*Noise( p );
     return f/0.984375;
 }
@@ -51,7 +50,7 @@ float FBMR( float2 p,float iterNum)
 	float sum = 0.0;
 	for(int i = 0;i< iterNum;i++){
 		f += s*Noise( p ); 
-		p = mul(_FBM_M2,p)*s2;
+		p = mul(_m2,p)*s2;
 		sum+=s;
 		s*= 0.5;s2+=0.01;
 	}

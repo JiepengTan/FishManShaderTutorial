@@ -109,7 +109,7 @@ Shader "FishManShaderTutorial/RayMarchFramework" {
 			        Map(pos+eps.yyx).x - Map(pos-eps.yyx).x );
 			    return normalize(nor);
 			}
-			
+			// 省掉了camera 设置相关
             float4 ProcessRayMarch(float2 uv,float3 ro,float3 rd,inout float sceneDep,float4 sceneCol)  {
 				float2 ret = RayCast(ro,rd);
 			    float3 pos = ro+ret.x*rd;

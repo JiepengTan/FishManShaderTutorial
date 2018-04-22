@@ -27,10 +27,6 @@ Shader "FishManShaderTutorial/HighlandLake" {
 			float waterHeight = 4.;
 			#define lightDir (_WorldSpaceLightPos0.xyz)
 			float SC = 15;
-			const float2x2 m2 = float2x2( 0.60, -0.80, 0.80, 0.60 );
-			const float3x3 m3 = float3x3( 0.00,  0.80,  0.60,
-										 -0.80,  0.36, -0.48,
-										 -0.60, -0.48,  0.64 );
 
 			float WaterMap( fixed3 pos ) {
 				return FBM( fixed3( pos.xz, ftime )) * 1;

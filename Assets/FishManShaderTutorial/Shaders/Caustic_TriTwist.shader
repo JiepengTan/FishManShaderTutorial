@@ -1,56 +1,30 @@
-﻿// create by JiepengTan 2018-04-12  email: jiepengtan@gmail.com
-// all right reserve
-Shader "FishManShaderTutorial/Caustic_TriTwist"
-{
-    Properties
-    {
+﻿// create by JiepengTan 
+// date: 2018-04-11 
+// email: jiepengtan@gmail.com
+Shader "FishManShaderTutorial/Caustic_TriTwist"{
+	Properties{
         _MainTex ("Texture", 2D) = "white" {}
-        _TileNum ("TileNum", float) = 5
+        _TileNum ("TileNum", float) = 1
     }
-
-    SubShader
-    {
+	SubShader
+	{
         Tags { "RenderType"="Opaque" }
-        LOD 100
+	    Pass
+	    {
+	        ZWrite Off
+	        Blend SrcAlpha OneMinusSrcAlpha
 
-        Pass
-        {
-            CGPROGRAM
-            #pragma vertex vert
-            #pragma fragment frag
-            #include "UnityCG.cginc"
-            #include "ShaderLibs/Feature.cginc"
-            struct appdata
-            {
-                float4 vertex : POSITION;
-                float2 uv : TEXCOORD0;
-            };
-
-            struct v2f
-            {
-                float2 uv : TEXCOORD0;
-                float4 vertex : SV_POSITION;
-            };
-			
-            sampler2D _MainTex;
-            float4 _MainTex_ST;
+	        CGPROGRAM
+	        #pragma vertex vert
+	        #pragma fragment frag
+			#include "ShaderLibs/Framework2D.cginc"
             float _TileNum ; 
-          
-            v2f vert (appdata v)
-            {
-                v2f o;
-                o.vertex = UnityObjectToClipPos(v.vertex);
-                o.uv = TRANSFORM_TEX(v.uv, _MainTex);
-                return o;
-            }
-
-	
-            fixed4 frag (v2f i) : SV_Target
-            {
-				float2 uv = _TileNum * i.uv;
+		 
+			float3 ProcessFrag(float2 _uv){
+				float2 uv = _TileNum * _uv;
 				float time = _Time.y;
-				float val = CausticTriTwist(uv*0.3,time);
-                return float4(val,val,val,1.0);
+				float val = CausticTriTwist(uv,time); 
+                return float3(val,val,val);
             }
             ENDCG
         }

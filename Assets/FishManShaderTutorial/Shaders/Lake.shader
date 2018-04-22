@@ -1,4 +1,6 @@
-﻿// create by JiepengTan 2018-04-16  email: jiepengtan@gmail.com
+﻿// create by JiepengTan 
+// date: 2018-04-16  
+// email: jiepengtan@gmail.com
 Shader "FishManShaderTutorial/Lake" {
     Properties{
         _MainTex("Base (RGB)", 2D) = "white" {}
@@ -22,27 +24,18 @@ Shader "FishManShaderTutorial/Lake" {
 			float3 _LightWaterColor;
 			
 			float waterHeight = 4.;
-			const float2x2 m2 = float2x2( 0.60, -0.80, 0.80, 0.60 );
-			const float3x3 m3 = float3x3( 0.00,  0.80,  0.60,
-										 -0.80,  0.36, -0.48,
-										 -0.60, -0.48,  0.64 );
-
-
-
-			//#define lightDir _WorldSpaceLightPos0 
-			
 
 			float3 lightDir ;
-			float FBM( in float3 p ) {
+			float _FBM( in float3 p ) {
 				float f = 0.0;
-				f += 0.5000*Noise( p ); p = mul(m3,p)*2.02;
-				f += 0.2500*Noise( p ); p = mul(m3,p)*2.03;
-				f += 0.1250*Noise( p ); p = mul(m3,p)*2.01; 
+				f += 0.5000*Noise( p ); p = mul(_m3,p)*2.02;
+				f += 0.2500*Noise( p ); p = mul(_m3,p)*2.03;
+				f += 0.1250*Noise( p ); p = mul(_m3,p)*2.01; 
 				f += 0.0625*Noise( p );
 				return f/0.9375;
 			}
 			float WaterMap( fixed3 pos ) {
-				return fbm( fixed3( pos.xz, ftime )) * 1;
+				return _FBM( fixed3( pos.xz, ftime )) * 1;
 			}
 
 			float3 WaterNormal(float3 pos,float rz){

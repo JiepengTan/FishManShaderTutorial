@@ -1,4 +1,6 @@
-
+// create by JiepengTan 
+// date: 2018-03-27  
+// email: jiepengtan@gmail.com
 Shader "FishManShaderTutorial/2DCloudSea"{
 	Properties{
 	    _MainTex ("MainTex", 2D) = "white" {}
@@ -16,33 +18,8 @@ Shader "FishManShaderTutorial/2DCloudSea"{
 	        CGPROGRAM
 	        #pragma vertex vert
 	        #pragma fragment frag
-			#pragma exclude_renderers d3d11_9x
-	        #include "UnityCG.cginc"
-		 
-            struct v2f {
-		        fixed4 pos : SV_POSITION;
-		        fixed2 uv : TEXCOORD0;
-		        fixed2 uv_depth : TEXCOORD1;
-		        fixed4 interpolatedRay : TEXCOORD2;
-	        };
-	        v2f vert(appdata_img v) {
-		        v2f o;
-		        o.pos = UnityObjectToClipPos(v.vertex);
-		        o.uv = v.texcoord;
-		        return o;
-	        }
-			
-			fixed4 ProcessFrag(v2f input);
-
-			fixed4 frag(v2f i) : SV_Target{
-				fixed4 finalColor =fixed4(0.,0.,0.,0.);
-				fixed4 processCol = ProcessFrag(i);
-                finalColor = processCol;
-                finalColor.w =1.0;
-				return finalColor;
-			}
-			
-		
+			#include "ShaderLibs/Framework2D.cginc"
+	
 			#define LAYER 22.0
 			fixed Wave(float layer,fixed2 uv,fixed val){
 				float amplitude =  layer*layer*0.00004;
@@ -89,9 +66,8 @@ Shader "FishManShaderTutorial/2DCloudSea"{
 				col += DrawCloud( uv,fixed2(0.45,0.45),0.2);
 				return col;
 			}
-			fixed4 ProcessFrag(v2f vfi)  {
-				fixed2 uv = vfi.uv;
-			    fixed3 col = fixed3(0.0,0.0,0.0);
+			float3 ProcessFrag(float2 uv)  {
+			    float3 col = float3(0.0,0.0,0.0);
 			    float num = 0.;
 			    for (float i=1.; i < LAYER; i++) {
 			    	float wave = 2.*Wave(i,uv,1.)+Wave(i,uv,1.8)+.5*Wave(i,uv,3.);
@@ -119,7 +95,7 @@ Shader "FishManShaderTutorial/2DCloudSea"{
 				col = lerp( col ,fixed3(0.98,0.9,0.1),sun);
 				//云
 				col += DrawClouds(uv);
-				return fixed4(col,1.0);
+				return col;
 			}
 	    ENDCG
 	}//end pass

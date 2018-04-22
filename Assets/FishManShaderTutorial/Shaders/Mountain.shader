@@ -18,7 +18,6 @@ Shader "FishManShaderTutorial/Mountain" {
 
             #define SC (15.0)
             #define kMaxT (5000.0*SC)
-            #define m2 (float2x2(0.8,-0.6,0.6,0.8))
             
 
 
@@ -56,7 +55,7 @@ Shader "FishManShaderTutorial/Mountain" {
                     d += n.yz;
                     a += b*n.x;///(1.0+dot(d,d));
                     b *= 0.5;
-                    p = p*2.0;//mul(m2,p)*2.0;
+                    p = p*2.0;//mul(_m2,p)*2.0;
                 }
 
                 return SC*120.0*a;
@@ -75,7 +74,7 @@ Shader "FishManShaderTutorial/Mountain" {
                     d += n.yz;
                     a += b*n.x/(1.0+dot(d,d));
                     b *= 0.5;
-                    p =mul(m2,p)*2.0;
+                    p =mul(_m2,p)*2.0;
                 }
                 return SC*120.0*a;
             }
@@ -93,7 +92,7 @@ Shader "FishManShaderTutorial/Mountain" {
                     d += n.yz;
                     a += b*n.x/(1.0+dot(d,d));
                     b *= 0.5;
-                    p =mul(m2,p)*2.0;
+                    p =mul(_m2,p)*2.0;
                 }
 
                 return SC*120.0*a;
@@ -142,11 +141,11 @@ Shader "FishManShaderTutorial/Mountain" {
             {
                 float2 f = 0.0;
 				p += _Time.y * 0.5;
-                f += 0.5000*tex2D(_NoiseTex, p/256).x; p = mul(m2,p)*2.02;
+                f += 0.5000*tex2D(_NoiseTex, p/256).x; p = mul(_m2,p)*2.02;
 				p += _Time.y * 0.25;
-                f += 0.2500*tex2D(_NoiseTex, p/256).x; p = mul(m2,p)*2.03;
+                f += 0.2500*tex2D(_NoiseTex, p/256).x; p = mul(_m2,p)*2.03;
 				p += _Time.y * 1;
-                f += 0.1250*tex2D(_NoiseTex, p/256).x; p = mul(m2,p)*2.01;
+                f += 0.1250*tex2D(_NoiseTex, p/256).x; p = mul(_m2,p)*2.01;
 				p += _Time.y * 2;
                 f += 0.0625*tex2D(_NoiseTex, p/256).x;
                 return f/0.9375;				  
@@ -159,7 +158,7 @@ Shader "FishManShaderTutorial/Mountain" {
 				float sum =0;
 				for(int i=0;i<4;i++){
 					p += t;
-					f += s*tex2D(_NoiseTex, p/256).x; p = mul(m2,p)*2.02;
+					f += s*tex2D(_NoiseTex, p/256).x; p = mul(_m2,p)*2.02;
 					t *=1.5;
 					sum+= s;
 					s*=0.6;
