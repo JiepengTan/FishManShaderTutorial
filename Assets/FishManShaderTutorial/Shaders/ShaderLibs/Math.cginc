@@ -1,4 +1,5 @@
-// Merge by JiepengTan@gmail.com
+// Create  by JiepengTan@gmail.com
+// 2018-03-27
 #ifndef FMST_MATH
 #define FMST_MATH
 
@@ -11,9 +12,13 @@
 #define _m2 (float2x2(0.8,-0.6,0.6,0.8))
 #define _m3 (float3x3( 0.00,  0.80,  0.60, -0.80,  0.36, -0.48, -0.60, -0.48,  0.64 ))
 
-float3x3 Rotx(fixed a){a*= Radius2Deg; fixed sa = sin(a); fixed ca = cos(a); return float3x3(1.,.0,.0,    .0,ca,sa,   .0,-sa,ca);}
-float3x3 Roty(fixed a){a*= Radius2Deg; fixed sa = sin(a); fixed ca = cos(a); return float3x3(ca,.0,sa,    .0,1.,.0,   -sa,.0,ca);}
-float3x3 Rotz(fixed a){a*= Radius2Deg; fixed sa = sin(a); fixed ca = cos(a); return float3x3(ca,sa,.0,    -sa,ca,.0,  .0,.0,1.); }
+float2x2 Rot2D(float a){a*= Radius2Deg; float sa = sin(a); float ca = cos(a); return float2x2(ca,-sa,sa,ca);}
+float2x2 Rot2DRad(float a){float sa = sin(a); float ca = cos(a); return float2x2(ca,-sa,sa,ca);}
+
+
+float3x3 Rotx(float a){a*= Radius2Deg; float sa = sin(a); float ca = cos(a); return float3x3(1.,.0,.0,    .0,ca,sa,   .0,-sa,ca);}
+float3x3 Roty(float a){a*= Radius2Deg; float sa = sin(a); float ca = cos(a); return float3x3(ca,.0,sa,    .0,1.,.0,   -sa,.0,ca);}
+float3x3 Rotz(float a){a*= Radius2Deg; float sa = sin(a); float ca = cos(a); return float3x3(ca,sa,.0,    -sa,ca,.0,  .0,.0,1.); }
 
 float3x3 RotEuler(float3 ang) {
 	ang = ang*Radius2Deg;
@@ -27,4 +32,7 @@ float3x3 RotEuler(float3 ang) {
     return m;
 }
 
+float Remap(float oa,float ob,float na,float nb,float val){
+	return (val-oa)/(ob-oa) * (nb-na) + na;
+}
 #endif // FMST_MATH

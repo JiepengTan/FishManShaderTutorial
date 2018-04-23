@@ -72,7 +72,7 @@ Shader "FishManShaderTutorial/Lake" {
 
             float4 ProcessRayMarch(float2 uv,float3 ro,float3 rd,inout float sceneDep,float4 sceneCol){ 
 				fixed3 col = RayMarchCloud(ro,rd);
-				if(rd.y < -0.01 ) {
+				if(rd.y < -0.01 ) { 
 					float rz = (-ro.y)/rd.y;
 					float3 pos = ro + rd * rz; 
 					float3 normal = WaterNormal(pos,rz);

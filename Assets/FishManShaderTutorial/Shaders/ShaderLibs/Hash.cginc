@@ -1,4 +1,5 @@
 // Merge by JiepengTan@gmail.com
+// 2018-03-27
 #ifndef FMST_HASH
 #define FMST_HASH
 

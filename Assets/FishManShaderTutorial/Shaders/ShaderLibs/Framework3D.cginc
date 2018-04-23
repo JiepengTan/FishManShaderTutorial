@@ -1,4 +1,5 @@
-// Motion vector shader for Skinner Particle
+// Create  by JiepengTan@gmail.com
+// 2018-03-27
 #include "FBM.cginc"
 #include "Feature.cginc"
 

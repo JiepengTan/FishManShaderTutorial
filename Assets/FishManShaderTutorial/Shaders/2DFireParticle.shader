@@ -4,6 +4,11 @@
 Shader "FishManShaderTutorial/2DFireParticle"{
 	Properties{
 	    _MainTex ("MainTex", 2D) = "white" {}
+	    _Color ("_Color", Color) = (1.0,0.3,0.0,1.)
+	    _GridSize ("SparkGridSize", float) = 30
+	    _RotSpd ("_RotSpd", float) = 0.5
+	    _YSpd ("_YSpd", float) = 0.7
+		
 	}
 
 	SubShader
@@ -19,37 +24,39 @@ Shader "FishManShaderTutorial/2DFireParticle"{
 	        #pragma vertex vert
 	        #pragma fragment frag
 			#include "ShaderLibs/Framework2D.cginc"
-		 
+			
+			float3 _Color;
+			float _GridSize;
+			float _RotSpd;
+			float _YSpd;
 			float3 ProcessFrag(float2 uv){
-				fixed3 acc = fixed3(0.0,0.0,0.0);
-				fixed time = _Time.y;
+				float3 acc = float3(0.0,0.0,0.0);
 
-				fixed3 fireCol = fixed3(1.0,0.3,0.0);
-				fixed sparkGridSize = 30.0;//»®·Ö¸ñ×Ó
-				fixed rotateSpd = 3.*time;//¿ØÖÆÐý×ªËÙ¶È
-				fixed yOffset = 4.*time;//¿ØÖÆÁ£×ÓÉÏÉýËÙ¶È
+				float rotDeg = 3.*_RotSpd * ftime;
+				float yOffset = 4.*_YSpd* ftime;
 
-				fixed2 coord = uv*sparkGridSize - fixed2(0.,yOffset);
-				if (abs(fmod(coord.y,2.0))<1.0) //Æ«ÒÆ°ë¸ö¸ñ×Ó
+				float2 coord = uv*_GridSize - float2(0.,yOffset);//整体沿y轴上升
+				if (abs(fmod(coord.y,2.0))<1.0) //让格子交错
 					coord.x += 0.5;
-				fixed2 sparkGridIndex = fixed2(floor(coord));
-				fixed sparkRandom = Hash12(sparkGridIndex);//¶¨ÒåÁ£×ÓµÄ´óÐ¡
-				fixed sparkLife = min(10.0*(1.0-min((sparkGridIndex.y + yOffset)/(24.0-20.0*sparkRandom),1.0)),1.0);//Ë³Ó¦YÖáÍùÏÂÒÆ¶¯µÄÍ¬Ê±  ²»¶ÏµÄÉ¾¼õÁÁ¶È
-				//acc = fixed3(sparkRandom,sparkRandom,sparkRandom);
-				if (sparkLife>0.0 ) {
-					fixed size = 0.08*sparkRandom;//¶¨ÒåÁ£×ÓµÄ´óÐ¡
-					fixed deg = 999.0*sparkRandom*2.0*PI + rotateSpd*(0.5+0.5*sparkRandom);//³õÊ¼»¯Ðý×ª³õ½Ç¶È
-					fixed2 rotate = fixed2(sin(deg),cos(deg));
-					fixed radius =  0.5-size*0.2;
-					fixed2 cirOffset = radius*rotate;//¸ù¾ÝÁ£×ÓµÄ´óÐ¡¾ö¶¨ÆäÐý×ª°ë¾¶
-					fixed2 part = frac(coord-cirOffset) - 0.5 ;
+				float2 gridIndex = float2(floor(coord));
+				float rnd = Hash12(gridIndex);//根据ID 获取hash值
+				// 弥补y轴上升的逆差 获取原来的y值 
+				// 同时因为gridIndex = floor(coord) 的原因  会让tempY值在锁定固定的grid的同时越来越大;
+				float tempY = gridIndex.y + yOffset ;
+				float life = min(	10.0*(1.0-min((tempY)/(24.0-20.0*rnd)//生命值随机
+													,1.0)),1.0);
+				if (life>0.0 ) {
+					float size = 0.08*rnd;//让大小随机化
+					float deg = 999.0*rnd*2.0*PI + rotDeg*(0.5+0.5*rnd);//添加旋转随机化
+					float radius =  0.5-size*0.2;
+					float2 cirOffset = radius*float2(sin(deg),cos(deg));//单位圆旋转偏移
+					float2 part = frac(coord-cirOffset) - 0.5 ;//让格子自己旋转起来 位置变 方向不变
 					float len = length(part);
-					fixed sparksGray = max(0.0,1.0 -len/size);//ÈÃÔ²±äÐ¡µã
-					fixed sinval = sin(PI*1.*(0.3+0.7*sparkRandom)*time+sparkRandom*10.);
-					fixed period = pow(sinval,5.);
-					period = clamp(pow(period,5.),0.,1.);
-					fixed blink =(0.8+0.8*abs(period));
-					acc = sparkLife*sparksGray*fireCol*blink;
+					float sparksGray = max(0.0,1.0 -len/size);//画圆
+					float sinval = sin(PI*1.*(0.3+0.7*rnd)*ftime+rnd*10.);//加点亮度的变化实现闪烁 
+					float period = clamp(pow(pow(sinval,5.),5.),0.,1.);
+					float blink =(0.8+0.8*abs(period));
+					acc = life*sparksGray*_Color*blink;
 				}
 				return acc;
 			}

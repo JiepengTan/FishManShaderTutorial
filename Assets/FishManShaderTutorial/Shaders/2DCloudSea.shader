@@ -41,9 +41,7 @@ Shader "FishManShaderTutorial/2DCloudSea"{
 				float offs =( sin(deg*9)*3.+sin(deg*11+sin(_Time.y*6)*.5))*0.05;
 				return smoothstep(1.+offs,1.-blur+offs,len);
 			}
-			float Remap(float a,float b,float c,float d,float val){
-				return (val-a)/(b-a) * (d-c) + c;
-			}
+
 			float DrawCloud(fixed2 uv,fixed2 center,float size){
 				uv = uv - center;
 				uv /= size;
