@@ -33,12 +33,12 @@ Shader "FishManShaderTutorial/HighlandLake" {
 			}
 
 			float3 WaterNormal(float3 pos,float rz){
-				float EPSILON = 0.01;
+				float EPSILON = 0.003*rz*rz;
 				float3 dx = float3( EPSILON, 0.,0. );
 				float3 dz = float3( 0.,0., EPSILON );
 					
 				float3	normal = float3( 0., 1., 0. );
-				float bumpfactor = 0.3 * pow(1.-clamp((rz)/100.,0.,1.),6.);//根据距离所见Bump幅度
+				float bumpfactor = 0.4 * pow(1.-clamp((rz)/1000.,0.,1.),6.);//根据距离所见Bump幅度
 				
 				normal.x = -bumpfactor * (WaterMap(pos + dx) - WaterMap(pos-dx) ) / (2. * EPSILON);
 				normal.z = -bumpfactor * (WaterMap(pos + dz) - WaterMap(pos-dz) ) / (2. * EPSILON);
@@ -163,8 +163,8 @@ Shader "FishManShaderTutorial/HighlandLake" {
 					waterT = min(waterT,t);
 				}
 				float sundot = clamp(dot(rd,lightDir),0.0,1.0);
-
 				float rz = InteresctTerrial(ro,rd,minT,maxT);
+				float firstInsertRZ = min(rz,waterT);
 				float fresnel = 0;
 				float3 refractCol = float3(0.,0.,0.);
 				bool reflected = false;
@@ -198,11 +198,7 @@ Shader "FishManShaderTutorial/HighlandLake" {
 					col += float3(spec,spec,spec);
 				}
 				
-				/**/
-				// sun scatter
-                //col += 0.3*float3(1.0,0.7,0.3)*pow( sundot, 8.0 );
-                // gamma
-                //col = sqrt(col);
+				MergeUnityIntoRayMarching(firstInsertRZ,col,sceneDep,sceneCol); 
                 sceneCol.xyz = col;
 
                 return sceneCol;

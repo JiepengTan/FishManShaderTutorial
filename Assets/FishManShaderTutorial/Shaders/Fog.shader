@@ -59,13 +59,11 @@ Shader "FishManShaderTutorial/Fog" {
 					col = lerp(fixed3(0.1,0.2,1),fixed3(.3,.5,1),pos.y*.5)*0.2+.1;
 					col = col*dif + col*spe*.5 ;
 				}
-				//ordinary distance fog first
-				if(rz>sceneDep){
-					col = sceneCol;
-					rz = sceneDep;
-				}
-				col = lerp(col, fogb, smoothstep(FAR-7.,FAR,rz));
-				//then volumetric fog
+				 
+				MergeRayMarchingIntoUnity(rz,col,sceneDep,sceneCol);  
+			
+				col = lerp(col, fogb, smoothstep(FAR-7.,FAR,rz)); 
+				//then volumetric fog 
 				col = Fog(col, ro, rd, rz,_FogCol,_FogSpd,_FogHighRange);
 				//post
 				col = pow(col,float3(0.8,0.8,0.8));

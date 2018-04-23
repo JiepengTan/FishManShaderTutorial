@@ -18,7 +18,7 @@ Shader "FishManShaderTutorial/GameHPUI" {
             #pragma fragment frag
             #include "UnityCG.cginc"
 			#include "ShaderLibs/Math.cginc"
-
+			 
 			#define  SIZE  0.5
 			#define WATER_DEEP 0.6
             struct appdata
@@ -45,10 +45,6 @@ Shader "FishManShaderTutorial/GameHPUI" {
 			float2 Within(float2 uv, float4 rect) {
 				return (uv-rect.xy)/(rect.zw-rect.xy);
 			}
-			float Remap(float a,float b,float c,float d,float val){
-				return (val-a)/(b-a) * (d-c) + c;
-			}
-
 			float Circle(float2 uv,float2 center,float size,float blur){
 				uv = uv - center;
 				uv /= size;

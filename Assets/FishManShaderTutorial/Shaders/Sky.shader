@@ -10,7 +10,6 @@ Shader "FishManShaderTutorial/Mountain" {
 
 #pragma vertex vert   
 #pragma fragment frag  
-#include "ShaderLibs/Feature.cginc"
 #include "ShaderLibs/Framework3D.cginc"
 
 			

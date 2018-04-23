@@ -49,6 +49,21 @@ v2f vert(appdata_img v) {
 	return o;
 }
 
+//RayMarching is the main world, ignore unity sky box
+void MergeUnityIntoRayMarching(inout float rz,inout float3 rCol, float unityDep,float4 unityCol){
+	if(rz>unityDep && unityDep<_ProjectionParams.z-1.){// unity camera far plane 
+		rCol = unityCol.xyz;
+		rz = unityDep;
+	}
+}
+//Unity scene is the main world, ignore RayMarching sky box
+void MergeRayMarchingIntoUnity(inout float rz,inout float3 rCol, float unityDep,float4 unityCol){
+	if(rz>unityDep ){
+		rCol = unityCol.xyz;
+		rz = unityDep;
+	}
+}			
+
 float4 ProcessRayMarch(float2 uv,float3 ro,float3 rd,inout float sceneDep,float4 sceneCol);
 float4 frag(v2f i) : SV_Target{
 	float depth = LinearEyeDepth(SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, i.uv_depth));

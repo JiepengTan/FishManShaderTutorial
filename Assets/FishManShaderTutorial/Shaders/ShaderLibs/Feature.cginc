@@ -52,13 +52,11 @@ float CausticVoronoi(float2 p,float time) {
 	return v;
 }
 
-// 通过rd 来进行空间划分 这样在根据相机进行改变
 float3 Stars(in float3 rd,float den,float tileNum)
 {
     float3 c = float3(0.,0.,0.);
     float3 p = rd;
 	float SIZE = 0.5;
-    //分多层
     for (float i=0.;i<3.;i++)
     {
         float3 q = frac(p*tileNum)-0.5;
@@ -68,10 +66,10 @@ float3 Stars(in float3 rd,float den,float tileNum)
 		float size = (Hash13(id)*0.2+0.8)*SIZE; 
 		float demp = pow(1.-size/SIZE,.8)*0.45;
 		float val = (sin(_Time.y*31.*size)*demp+1.-demp) * size;
-        float c2 = 1.-smoothstep(0.,val,length(q));//画圆
-        c2 *= step(rn.x,(.0005+i*i*0.001)*den);//随机显示 随着深度的层数的增加添加更多的星星 增加每个grid 出现星星的概率
-        c += c2*(lerp(float3(1.0,0.49,0.1),float3(0.75,0.9,1.),rn.y)*0.25+0.75);//不同的亮度
-        p *= 1.4;//增加grid密度
+        float c2 = 1.-smoothstep(0.,val,length(q));
+        c2 *= step(rn.x,(.0005+i*i*0.001)*den);
+        c += c2*(lerp(float3(1.0,0.49,0.1),float3(0.75,0.9,1.),rn.y)*0.25+0.75);
+        p *= 1.4;
     }
     return c*c*.7;
 }
