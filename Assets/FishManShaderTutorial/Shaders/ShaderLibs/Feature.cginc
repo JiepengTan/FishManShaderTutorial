@@ -122,6 +122,16 @@ fixed3 Fog(in fixed3 bgCol, in fixed3 ro, in fixed3 rd, in fixed maxT,
 	return col;
 }
 
+// http://iquilezles.org/www/articles/checkerfiltering/checkerfiltering.htm
+fixed CheckersGradBox( in fixed2 p )
+{
+    // filter kernel
+    fixed2 w = fwidth(p) + 0.001;
+    // analytical integral (box filter)
+    fixed2 i = 2.0*(abs(frac((p-0.5*w)*0.5)-0.5)-abs(frac((p+0.5*w)*0.5)-0.5))/w;
+    // xor pattern
+    return 0.5 - 0.5*i.x*i.y;                  
+}
 
 #define Caustic CausticRotateMin
 
