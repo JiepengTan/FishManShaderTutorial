@@ -8,7 +8,31 @@
 #define Deg2Radius PI/180.
 #define Radius2Deg 180./PI
 
+#define clamp01(a) clamp(a,0.0,1.0)
 
+fixed length2( fixed2 p )
+{
+    return sqrt( p.x*p.x + p.y*p.y );
+}
+
+fixed length6( fixed2 p )
+{
+    p = p*p*p; p = p*p;
+    return pow( p.x + p.y, 1.0/6.0 );
+}
+
+fixed length8( fixed2 p )
+{
+    p = p*p; p = p*p; p = p*p;
+    return pow( p.x + p.y, 1.0/8.0 );
+}
+
+
+fixed smin( fixed a, fixed b, fixed k )
+{
+    fixed h = clamp( 0.5+0.5*(b-a)/k, 0.0, 1.0 );
+    return lerp( b, a, h ) - k*h*(1.0-h);
+}
 #define _m2 (float2x2(0.8,-0.6,0.6,0.8))
 #define _m3 (float3x3( 0.00,  0.80,  0.60, -0.80,  0.36, -0.48, -0.60, -0.48,  0.64 ))
 

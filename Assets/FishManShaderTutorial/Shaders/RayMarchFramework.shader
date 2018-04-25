@@ -23,7 +23,7 @@ Shader "FishManShaderTutorial/RayMarchFramework" {
 			float MapSphere(float3 pos){
 				// center at float3(0.,0.,0.);
 				float radius = 0.5;
-				float3 centerPos = float3(0.,1.0+ sin(_Time.y*1.)*0.5,0.);
+				float3 centerPos = float3(0.,1.0+ sin(_Time.y*1.*PI)*0.5,0.);
 				return length(pos-centerPos) - radius;
 			}
 			float MapFloor(float3 pos ){
