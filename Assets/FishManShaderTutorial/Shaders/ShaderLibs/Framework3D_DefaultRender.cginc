@@ -7,38 +7,38 @@
 #include "Framework3D.cginc"
 
 
-fixed3 MatCol(float matID,float3 pos,float3 nor);
-fixed2 Map( in fixed3 pos );
-fixed3 Render( in fixed3 ro, in fixed3 rd );
+float3 MatCol(float matID,float3 pos,float3 nor);
+float2 Map( in float3 pos );
+float3 Render( in float3 ro, in float3 rd );
 
-fixed2 RayCast( in fixed3 ro, in fixed3 rd )
+float2 RayCast( in float3 ro, in float3 rd )
 {
-    fixed tmin = 1.0;
-    fixed tmax = 20.0;
+    float tmin = 1.0;
+    float tmax = 20.0;
              
-    fixed t = tmin;
-    fixed m = -1.0;
+    float t = tmin;
+    float m = -1.0;
     for( int i=0; i<128; i++ )
     {
-        fixed precis = 0.0005*t;
-        fixed2 res = Map( ro+rd*t );
+        float precis = 0.0005*t;
+        float2 res = Map( ro+rd*t );
         if( res.x<precis || t>tmax ) break;
         t += res.x;
         m = res.y;
     } 
 
     if( t>tmax ) m=-1.0;
-    return fixed2( t, m );
+    return float2( t, m );
 }
 
 
-fixed SoftShadow( in fixed3 ro, in fixed3 rd, in fixed mint, in fixed tmax )
+float SoftShadow( in float3 ro, in float3 rd, in float mint, in float tmax )
 {
-    fixed res = 1.0;
-    fixed t = mint;
+    float res = 1.0;
+    float t = mint;
     for( int i=0; i<80; i++ )
     {
-        fixed h = Map( ro + rd*t ).x;
+        float h = Map( ro + rd*t ).x;
         res = min( res, 8.0*h/t );
         t += clamp( h, 0.02, 0.10 );
         if( h<0.001 || t>tmax ) break;
@@ -46,85 +46,85 @@ fixed SoftShadow( in fixed3 ro, in fixed3 rd, in fixed mint, in fixed tmax )
     return clamp( res, 0.0, 1.0 );
 }
 
-fixed3 CalcNormal( in fixed3 pos )
+float3 CalcNormal( in float3 pos )
 {
-    fixed2 e = fixed2(1.0,-1.0)*0.5773*0.0005;
+    float2 e = float2(1.0,-1.0)*0.5773*0.0005;
     return normalize( e.xyy*Map( pos + e.xyy ).x + 
             			e.yyx*Map( pos + e.yyx ).x + 
             			e.yxy*Map( pos + e.yxy ).x + 
             			e.xxx*Map( pos + e.xxx ).x );
 }
 
-fixed CalcAO( in fixed3 pos, in fixed3 nor )
+float CalcAO( in float3 pos, in float3 nor )
 {
-    fixed occ = 0.0;
-    fixed sca = 1.0;
+    float occ = 0.0;
+    float sca = 1.0;
     for( int i=0; i<5; i++ )
     {
-        fixed hr = 0.01 + 0.12*fixed(i)/4.0;
-        fixed3 aopos =  nor * hr + pos;
-        fixed dd = Map( aopos ).x;
+        float hr = 0.01 + 0.12*float(i)/4.0;
+        float3 aopos =  nor * hr + pos;
+        float dd = Map( aopos ).x;
         occ += -(dd-hr)*sca;
         sca *= 0.95;
     }
     return clamp( 1.0 - 3.0*occ, 0.0, 1.0 );    
 }
 #ifdef DEFAULT_RENDER
-fixed3 Render( in fixed3 ro, in fixed3 rd )
+float3 Render( in float3 ro, in float3 rd )
 { 
-    fixed3 col = fixed3(0.7, 0.9, 1.0) +rd.y*0.8;
-    fixed2 res = RayCast(ro,rd);
-    fixed t = res.x;
-    fixed m = res.y;
+    float3 col = float3(0.7, 0.9, 1.0) +rd.y*0.8;
+    float2 res = RayCast(ro,rd);
+    float t = res.x;
+    float m = res.y;
     if( m>-0.5 )
     {
-        fixed3 pos = ro + t*rd;
-        fixed3 nor = CalcNormal( pos );
-        fixed3 ref = reflect( rd, nor );
+        float3 pos = ro + t*rd;
+        float3 nor = CalcNormal( pos );
+        float3 ref = reflect( rd, nor );
 		col = MatCol(m,pos,nor);
 
         // lighitng        
-        fixed occ = CalcAO( pos, nor );
-        fixed3  lig = normalize( fixed3(-0.4, 0.7, -0.6) );
-        fixed3  hal = normalize( lig-rd );
-        fixed amb = clamp( 0.5+0.5*nor.y, 0.0, 1.0 );
-        fixed dif = clamp( dot( nor, lig ), 0.0, 1.0 );
-        fixed bac = clamp( dot( nor, normalize(fixed3(-lig.x,0.0,-lig.z))), 0.0, 1.0 )*clamp( 1.0-pos.y,0.0,1.0);
-        fixed dom = smoothstep( -0.1, 0.1, ref.y );
-        fixed fre = pow( clamp(1.0+dot(nor,rd),0.0,1.0), 2.0 );
+        float occ = CalcAO( pos, nor );
+        float3  lig = normalize( float3(-0.4, 0.7, -0.6) );
+        float3  hal = normalize( lig-rd );
+        float amb = clamp( 0.5+0.5*nor.y, 0.0, 1.0 );
+        float dif = clamp( dot( nor, lig ), 0.0, 1.0 );
+        float bac = clamp( dot( nor, normalize(float3(-lig.x,0.0,-lig.z))), 0.0, 1.0 )*clamp( 1.0-pos.y,0.0,1.0);
+        float dom = smoothstep( -0.1, 0.1, ref.y );
+        float fre = pow( clamp(1.0+dot(nor,rd),0.0,1.0), 2.0 );
                     
         dif *= SoftShadow( pos, lig, 0.02, 2.5 );
         dom *= SoftShadow( pos, ref, 0.02, 2.5 );
 
-        fixed spe = pow( clamp( dot( nor, hal ), 0.0, 1.0 ),16.0)*
+        float spe = pow( clamp( dot( nor, hal ), 0.0, 1.0 ),16.0)*
                     dif *
                     (0.04 + 0.96*pow( clamp(1.0+dot(hal,rd),0.0,1.0), 5.0 ));
 
-        fixed3 lin = fixed3(0.0,0.0,0.0);
-        lin += 1.30*dif*fixed3(1.00,0.80,0.55);
-        lin += 0.40*amb*fixed3(0.40,0.60,1.00)*occ;
-        lin += 0.50*dom*fixed3(0.40,0.60,1.00)*occ;
-        lin += 0.50*bac*fixed3(0.25,0.25,0.25)*occ;
-        lin += 0.25*fre*fixed3(1.00,1.00,1.00)*occ;
+        float3 lin = float3(0.0,0.0,0.0);
+        lin += 1.30*dif*float3(1.00,0.80,0.55);
+        lin += 0.40*amb*float3(0.40,0.60,1.00)*occ;
+        lin += 0.50*dom*float3(0.40,0.60,1.00)*occ;
+        lin += 0.50*bac*float3(0.25,0.25,0.25)*occ;
+        lin += 0.25*fre*float3(1.00,1.00,1.00)*occ;
         col = col*lin;
-        col += 10.00*spe*fixed3(1.00,0.90,0.70);
+        col += 10.00*spe*float3(1.00,0.90,0.70);
 
-        col = lerp( col, fixed3(0.8,0.9,1.0), 1.0-exp( -0.0002*t*t*t ) );
+        col = lerp( col, float3(0.8,0.9,1.0), 1.0-exp( -0.0002*t*t*t ) );
     }
 
-    return fixed3( clamp(col,0.0,1.0) );
+    return float3( clamp(col,0.0,1.0) );
 }
 #endif
 
 #ifdef DEFAULT_MAT_COL
-fixed3 MatCol(float matID,float3 pos,float3 nor)
+float3 MatCol(float matID,float3 pos,float3 nor)
 { 
 	// material        
-	fixed3 col = 0.45 + 0.35*sin( fixed3(0.05,0.08,0.10)*(matID-1.0) );
+	float3 col = 0.45 + 0.35*sin( float3(0.05,0.08,0.10)*(matID-1.0) );
 	if( matID<1.5 )
 	{       
-		fixed f = CheckersGradBox( 5.0*pos.xz );
-		col = 0.3 + f*fixed3(0.1,0.1,0.1);
+		float f = CheckersGradBox( 5.0*pos.xz );
+		col = 0.3 + f*float3(0.1,0.1,0.1);
 	}
 	return col;
 }
@@ -133,7 +133,7 @@ fixed3 MatCol(float matID,float3 pos,float3 nor)
 #ifdef DEFAULT_PROCESS_FRAG
 float4 ProcessRayMarch(float2 uv,float3 ro,float3 rd,inout float sceneDep,float4 sceneCol)  {
 		// render	
-	fixed3 col = Render( ro, rd );
+	float3 col = Render( ro, rd );
 	// gamma
 	col = pow( col, float3(0.4545,0.4545,0.4545) );
 	sceneCol.xyz = col;  

@@ -10,27 +10,27 @@
 
 #define clamp01(a) clamp(a,0.0,1.0)
 
-fixed length2( fixed2 p )
+float length2( float2 p )
 {
     return sqrt( p.x*p.x + p.y*p.y );
 }
 
-fixed length6( fixed2 p )
+float length6( float2 p )
 {
     p = p*p*p; p = p*p;
     return pow( p.x + p.y, 1.0/6.0 );
 }
 
-fixed length8( fixed2 p )
+float length8( float2 p )
 {
     p = p*p; p = p*p; p = p*p;
     return pow( p.x + p.y, 1.0/8.0 );
 }
 
 
-fixed smin( fixed a, fixed b, fixed k )
+float smin( float a, float b, float k )
 {
-    fixed h = clamp( 0.5+0.5*(b-a)/k, 0.0, 1.0 );
+    float h = clamp( 0.5+0.5*(b-a)/k, 0.0, 1.0 );
     return lerp( b, a, h ) - k*h*(1.0-h);
 }
 #define _m2 (float2x2(0.8,-0.6,0.6,0.8))
