@@ -9,11 +9,10 @@ Shader "FishManShaderTutorial/Mountain" {
             ZTest Always Cull Off ZWrite Off
             CGPROGRAM
 
-            float _MaxTerrianH;
-#define DEFAULT_RENDER_SKY
 #pragma vertex vert  
 #pragma fragment frag  
 #include "ShaderLibs/Framework3D_Terrain.cginc"
+            float _MaxTerrianH;
 
             #define Terrain(pos,NUM)\
                 float2 p = pos.xz*.9/_MaxTerrianH;\

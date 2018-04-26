@@ -11,17 +11,15 @@ Shader "FishManShaderTutorial/Desert" {
 #pragma vertex vert  
 #pragma fragment frag  
 #include "ShaderLibs/Framework3D.cginc"
-            // value Noise, and its analytical derivatives
-    	/*	*/
 			float terrainH( in float2 p)
 			{
 				//middle
-				float valM = Noise(p * 0.26) + 0.5;//0~1
+				float valM = PNoise(p * 0.26) + 0.5;//0~1
 				valM = 1.0 - abs(valM - 0.5) * 2.0;
 				valM = pow(valM,2.0);
     
 				//big
-				float valB = smoothstep(0.0,1.0,Noise(p * 0.2) + 0.5);//0~1
+				float valB = smoothstep(0.0,1.0,PNoise(p * 0.2) + 0.5);//0~1
 				float val =  valB * 0.8 +valM * 0.19*pow(valB,2.0) ;
 				return val * _LoopNum.z;
 			}

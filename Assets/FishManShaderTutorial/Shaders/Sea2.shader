@@ -17,7 +17,6 @@ Shader "FishManShaderTutorial/Sea2" {
 
 		MAP_LOOP_NUM ("MAP_LOOP_NUM", float) = 3 // color
 		MAPH_LOOP_NUM ("MAPH_LOOP_NUM", float) = 5 // color
-		RAY_MARCH_LOOP_NUM ("RAY_MARCH_LOOP_NUM", float) = 30 // color
 
     }
     SubShader{
@@ -28,7 +27,6 @@ Shader "FishManShaderTutorial/Sea2" {
 // 是否使用Noise 贴图来加速
 #define USING_VALUE_NOISE 
 
-#define DEFAULT_RENDER_SKY
 #pragma vertex vert  
 #pragma fragment frag  
 #include "ShaderLibs/Framework3D_Terrain.cginc"
@@ -40,12 +38,9 @@ Shader "FishManShaderTutorial/Sea2" {
 			float _SeaFreq = 0.16;
 			float3 _SeaBaseColor = float3(0.1,0.19,0.22);
 			float3 _SeaWaterColor = float3(0.8,0.9,0.6);
-#define EPSILON_NRM (0.1 / _ScreenParams.x)
-#define SEA_TIME (1.0 + _Time.y * _SeaSpeed)
-
 			float MAP_LOOP_NUM = 3;
 			float MAPH_LOOP_NUM = 5;
-			float RAY_MARCH_LOOP_NUM = 30;
+#define SEA_TIME (1.0 + _Time.y * _SeaSpeed)
 
 
 			
@@ -81,7 +76,7 @@ Shader "FishManShaderTutorial/Sea2" {
                 Waves(pos,MAP_LOOP_NUM);
             } 
             float2 TerrainM(float3 pos){
-                Waves(pos,9.);
+                Waves(pos,MAP_LOOP_NUM);
             } 
             float2 TerrainH(float3 pos){
                 Waves(pos,MAPH_LOOP_NUM);

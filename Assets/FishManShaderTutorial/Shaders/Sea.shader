@@ -14,7 +14,6 @@ Shader "FishManShaderTutorial/Sea" {
 
 #pragma vertex vert  
 #pragma fragment frag  
-#define DEFAULT_RENDER_SKY
 #include "ShaderLibs/Framework3D_Terrain.cginc"
 
 			float3 _SeaBaseColor;

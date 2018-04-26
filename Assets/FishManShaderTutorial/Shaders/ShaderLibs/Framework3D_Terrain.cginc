@@ -25,8 +25,5 @@ float SoftShadow(in float3 ro, in float3 rd,float tmax){
     _MACRO_SOFT_SHADOW(ro,rd,tmax,TerrainM);  
 }  
 
-#ifdef DEFAULT_RENDER_SKY
-
-#endif
 
 #endif // FRAMEWORK_3D_DEFAULT_SCENE
