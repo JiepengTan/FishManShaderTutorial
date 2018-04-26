@@ -66,6 +66,7 @@ void MergeRayMarchingIntoUnity(inout float rz,inout float3 rCol, float unityDep,
     }
 }           
 
+
 float4 ProcessRayMarch(float2 uv,float3 ro,float3 rd,inout float sceneDep,float4 sceneCol);
 
 float4 frag(v2f i) : SV_Target{
@@ -77,5 +78,43 @@ float4 frag(v2f i) : SV_Target{
     fixed3 rd = normalize(i.interpolatedRay.xyz);
     return ProcessRayMarch(uv,ro,rd,depth,sceneCol);
 }
+
+
+#define _MACRO_CALC_NORMAL(pos,rz, MAP_FUNC)\
+    float2 e = float2(1.0,-1.0)*0.5773*0.002*rz;\
+    return normalize( e.xyy*MAP_FUNC( pos + e.xyy ).x + \
+                        e.yyx*MAP_FUNC( pos + e.yyx ).x + \
+                        e.yxy*MAP_FUNC( pos + e.yxy ).x + \
+                        e.xxx*MAP_FUNC( pos + e.xxx ).x );
+
+
+#define _MACRO_SOFT_SHADOW(ro, rd, maxH,MAP_FUNC) \
+    float res = 1.0;\
+    float t = 0.001;\
+    for( int i=0; i<80; i++ ){\
+        float3  p = ro + t*rd;\
+        float h = MAP_FUNC( p).x;\
+        res = min( res, 16.0*h/t );\
+        t += h;\
+        if( res<0.001 ||p.y> maxH ) break;\
+    }\
+    return clamp( res, 0.0, 1.0 );
+
+
+#define _MRCRO_RAY_CAST( ro, rd ,tmax,MAP_FUNC)\
+    float t = .1;\
+    float m = -1.0;\
+    for( int i=0; i<256; i++ ) {\
+        float precis = 0.0005*t;\
+        float2 res = MAP_FUNC( ro+rd*t );\
+        if( res.x<precis || t>tmax ) break;\
+        t += 0.8*res.x;\
+        m = res.y;\
+    } \
+    if( t>tmax ) m=-1.0;\
+    return float2( t, m );
+
+
+
 
 #endif

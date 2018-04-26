@@ -49,7 +49,8 @@ Shader "FishManShaderTutorial/Sea2" {
 
 
 			
-			#define	Waves(uv,_LOOP_NUM)\
+			#define	Waves(pos,_LOOP_NUM)\
+				float2 uv = pos.xz;\
 				float2x2 octave_m = float2x2(1.6,1.2,-1.2,1.6);\
 				float freq = _SeaFreq;\
 				float amp = _SeaWaveHeight;\
@@ -63,7 +64,7 @@ Shader "FishManShaderTutorial/Sea2" {
 					uv = mul(octave_m,uv); freq *= 1.9; amp *= 0.22;\
 					choppy = lerp(choppy,1.0,0.2);\
 				}\
-				return h;
+				return float2(pos.y - h,1.0);
 
 				
 			// sea
@@ -75,19 +76,23 @@ Shader "FishManShaderTutorial/Sea2" {
 				return pow(1.0-pow(wv.x * wv.y,0.65),choppy);
 			}
 
-			float TerrainL(float2 uv){
-				Waves(uv,MAP_LOOP_NUM);
-			}
-			float TerrainH(float2 uv){
-				Waves(uv,MAPH_LOOP_NUM);
-			}
+
+            float2 TerrainL(float3 pos){ 
+                Waves(pos,MAP_LOOP_NUM);
+            } 
+            float2 TerrainM(float3 pos){
+                Waves(pos,9.);
+            } 
+            float2 TerrainH(float3 pos){
+                Waves(pos,MAPH_LOOP_NUM);
+            } 
 
 
 			float3 RenderSea(float3 pos, float3 rd,float rz, float3 nor, float3 lightDir) {  
 				float fresnel = clamp(1.0 - dot(nor,-rd), 0.0, 1.0);
 				fresnel = pow(fresnel,3.0) * 0.65;
         
-				float3 reflected = RenderSky(pos,reflect(rd,nor),lightDir);    
+				float3 reflected = Sky(pos,reflect(rd,nor),lightDir);    
 				float3 diff = pow(dot(nor,lightDir) * 0.4 + 0.6,3.);
 				float3 refracted = _SeaBaseColor + diff * _SeaWaterColor * 0.12;
 				float3 col = lerp(refracted,reflected,fresnel);
@@ -101,12 +106,12 @@ Shader "FishManShaderTutorial/Sea2" {
 			}
 
             float4 ProcessRayMarch(float2 uv,float3 ro,float3 rd,inout float sceneDep,float4 sceneCol){ 
-				float rz = RaycastTerrain(ro,rd); 
+				float rz = RaycastTerrain(ro,rd).x; 
 				float3 pos = ro + rd *rz;
-				float3 nor = NormalTerrian(pos.xz,rz);
+				float3 nor = NormalTerrian(pos,rz);
                  
 				// color
-				float3 skyCol = RenderSky(ro,rd,_LightDir );
+				float3 skyCol = Sky(ro,rd,_LightDir );
 				float3 seaCol = RenderSea(pos,rd,rz,nor,_LightDir);
 				float3 col = lerp(skyCol,seaCol,pow(smoothstep(0.0,-0.05,rd.y),0.3));
 				col = pow( col, float3(0.4545,0.4545,0.4545) );

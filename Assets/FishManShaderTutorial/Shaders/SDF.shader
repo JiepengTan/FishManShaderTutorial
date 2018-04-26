@@ -21,16 +21,16 @@ Shader "FishManShaderTutorial/SDF" {
 
             float3 rX(const in float3 v, const in float cs, const in float sn) {return mul(v,float3x3(1.0,0.0,0.0,0.0,cs,sn,0.0,-sn,cs));}
             float3 rY(const in float3 v, const in float cs, const in float sn) {return mul(v,float3x3(cs,0.0,-sn,0.0,1.0,0.0,sn,0.0,cs));}
-            float rZ(const in float3 v, const in float cs, const in float sn) {return mul(v,float3x3(cs,sn,0.0,-sn,cs,0.0,0.0,0.0,1.0));}
+            float3 rZ(const in float3 v, const in float cs, const in float sn) {return mul(v,float3x3(cs,sn,0.0,-sn,cs,0.0,0.0,0.0,1.0));}
 
 
             // implicitly specifies shading rules
-            #define WOOD_MAT 0.
+            #define WOOD_MAT 0.   
             #define STRAW_MAT 1.
-            #define VILLAGE_MAT 2.
-
-            #define BridgeL 40.
-            #define BridgeW 2.
+            #define VILLAGE_MAT 2. 
+ 
+            #define BridgeL 40. 
+            #define BridgeW 2.  
             #define BridgeH 4.
 
             #define BridgeL1 50.

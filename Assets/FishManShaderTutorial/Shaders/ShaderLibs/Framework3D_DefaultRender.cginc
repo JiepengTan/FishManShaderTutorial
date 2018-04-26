@@ -14,49 +14,16 @@ float3 MatCol(float matID,float3 pos,float3 nor);
 float2 Map( in float3 pos );
 float3 Render( in float3 ro, in float3 rd );
 
-float2 RayCast( in float3 ro, in float3 rd )
-{
-    float tmin = 1.0;
-    float tmax = 20.0;
-             
-    float t = tmin;
-    float m = -1.0;
-    for( int i=0; i<128; i++ )
-    {
-        float precis = 0.0005*t;
-        float2 res = Map( ro+rd*t );
-        if( res.x<precis || t>tmax ) break;
-        t += res.x;
-        m = res.y;
-    } 
-
-    if( t>tmax ) m=-1.0;
-    return float2( t, m );
+float RayCast(float3 ro, float3 rd) { 
+    _MRCRO_RAY_CAST(ro,rd,1000.,Map);  
+}
+float3 CalcNormal( in float3 pos, float rz ){
+    _MACRO_CALC_NORMAL(pos,rz,Map); 
 }
 
-
-float SoftShadow( in float3 ro, in float3 rd, in float mint, in float tmax )
-{
-    float res = 1.0;
-    float t = mint;
-    for( int i=0; i<80; i++ )
-    {
-        float h = Map( ro + rd*t ).x;
-        res = min( res, 8.0*h/t );
-        t += clamp( h, 0.02, 0.10 );
-        if( h<0.001 || t>tmax ) break;
-    }
-    return clamp( res, 0.0, 1.0 );
-}
-
-float3 CalcNormal( in float3 pos )
-{
-    float2 e = float2(1.0,-1.0)*0.5773*0.0005;
-    return normalize( e.xyy*Map( pos + e.xyy ).x + 
-            			e.yyx*Map( pos + e.yyx ).x + 
-            			e.yxy*Map( pos + e.yxy ).x + 
-            			e.xxx*Map( pos + e.xxx ).x );
-}
+float SoftShadow(in float3 ro, in float3 rd,float tmax){    
+    _MACRO_SOFT_SHADOW(ro,rd,tmax,Map);  
+}  
 
 float CalcAO( in float3 pos, in float3 nor )
 {
@@ -72,6 +39,7 @@ float CalcAO( in float3 pos, in float3 nor )
     }
     return clamp( 1.0 - 3.0*occ, 0.0, 1.0 );    
 }
+
 #ifdef DEFAULT_RENDER
 float3 Render( in float3 ro, in float3 rd )
 { 
@@ -96,8 +64,8 @@ float3 Render( in float3 ro, in float3 rd )
         float dom = smoothstep( -0.1, 0.1, ref.y );
         float fre = pow( clamp(1.0+dot(nor,rd),0.0,1.0), 2.0 );
                     
-        dif *= SoftShadow( pos, lig, 0.02, 2.5 );
-        dom *= SoftShadow( pos, ref, 0.02, 2.5 );
+        dif *= SoftShadow( pos, lig, 2.5 );
+        dom *= SoftShadow( pos, ref, 2.5 );
 
         float spe = pow( clamp( dot( nor, hal ), 0.0, 1.0 ),16.0)*
                     dif *

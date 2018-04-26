@@ -22,7 +22,8 @@ Shader "FishManShaderTutorial/Sea" {
             float4 _LoopNum;
 			float _SeaWaveHeight;
 
-		#define	Waves(uv,NUM)\
+			#define	Waves(pos,NUM)\
+				float2 uv = pos.xz;\
 				float w = 0.0,sw = 0.0;\
 				float iter = 0.0, ww = 1.0;\
 				uv += ftime * 0.5;\
@@ -32,7 +33,7 @@ Shader "FishManShaderTutorial/Sea" {
 					ww = lerp(ww, 0.0115, 0.4);\
 					iter += 2.39996;\
 				}\
-				return w / sw*_SeaWaveHeight;\
+				return float2(pos.y- w / sw*_SeaWaveHeight,1.);\
 
 				
 			float Wave(float2 uv, float2 emitter, float speed, float phase){ 
@@ -41,28 +42,22 @@ Shader "FishManShaderTutorial/Sea" {
 				return pow((0.5 + 0.5 * sin(dst * phase - ftime * speed)), 5.0);
 			}
 
-			float TerrainL(float2 uv){
-				Waves(uv,5);
-			}
-			float TerrainH(float2 uv){
-				Waves(uv,24);
-			}
-#ifndef DEFAULT_RENDER_SKY
-			// sky
-			float3 RenderSky(float3 ro,float3 rd,float3 lightDir) { 
-				rd.y = max(rd.y,0.0);
-				float3 col =  float3(pow(1.0-rd.y,2.0), 1.0-rd.y, 0.6+(1.0-rd.y)*0.4);
-				float val = pow(max(dot(rd,lightDir),0.0),200.0);
-				col += float3(val,val,val);
-				return col;
-			}
-#endif
-	
+
+            float2 TerrainL(float3 pos){ 
+                Waves(pos,5.);
+            } 
+            float2 TerrainM(float3 pos){
+                Waves(pos,9.);
+            } 
+            float2 TerrainH(float3 pos){
+                Waves(pos,24.);
+            } 
+
 			float3 RenderSea(float3 pos, float3 rd,float rz, float3 nor, float3 lightDir) {  
 				float fresnel = clamp(1.0 - dot(nor,-rd), 0.0, 1.0);
 				fresnel = pow(fresnel,3.0) * 0.65;
         
-				float3 reflected = RenderSky(pos,reflect(rd,nor),lightDir);    
+				float3 reflected = Sky(pos,reflect(rd,nor),lightDir);    
 				float3 diff = pow(dot(nor,lightDir) * 0.4 + 0.6,3.);
 				float3 refracted = _SeaBaseColor + diff * _SeaWaterColor * 0.12;
 				float3 col = lerp(refracted,reflected,fresnel);
@@ -75,12 +70,12 @@ Shader "FishManShaderTutorial/Sea" {
 				return col;
 			}
             float4 ProcessRayMarch(float2 uv,float3 ro,float3 rd,inout float sceneDep,float4 sceneCol){ 
-				float rz = RaycastTerrain(ro,rd); 
+				float rz = RaycastTerrain(ro,rd).x; 
 				float3 pos = ro + rd *rz;
-				float3 nor = NormalTerrian(pos.xz,rz);
+				float3 nor = NormalTerrian(pos,rz);
                  
 				// color
-				float3 skyCol = RenderSky(pos,rd,_LightDir);
+				float3 skyCol = Sky(pos,rd,_LightDir);
 				float3 seaCol = RenderSea(pos,rd,rz,nor,_LightDir);
 				float3 col = lerp(skyCol,seaCol,pow(smoothstep(0.0,-0.05,rd.y),0.3));
 				col = pow( col, float3(0.4545,0.4545,0.4545) );

@@ -1,4 +1,5 @@
-// create by JiepengTan 2018-04-13  email: jiepengtan@gmail.com
+// create by JiepengTan 2018-04-13  
+// email: jiepengtan@gmail.com
 Shader "FishManShaderTutorial/Fog" {
     Properties{
         _MainTex("Base (RGB)", 2D) = "white" {}
@@ -23,7 +24,7 @@ Shader "FishManShaderTutorial/Fog" {
             // value Noise, and its analytical derivatives
     				/*	*/
 			#define ITR 100 
-			#define FAR 30.
+			#define FAR 200.
 			
 
 			fixed3 normal(in fixed3 p)
