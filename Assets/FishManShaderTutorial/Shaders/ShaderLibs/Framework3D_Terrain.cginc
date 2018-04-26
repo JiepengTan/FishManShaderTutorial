@@ -34,6 +34,19 @@ float RaycastTerrain(float3 ro, float3 rd) {
 	return t;
 }
 
+#define _MACRO_SOFT_SHADOW(ro, rd, maxH,MAP_FUNC) \
+    float res = 1.0;\
+    float t = 0.001;\
+    for( int i=0; i<80; i++ ){\
+        float3  p = ro + t*rd;\
+        float h = p.y - MAP_FUNC( p.xz );\
+        res = min( res, 16.0*h/t );\
+        t += h;\
+        if( res<0.001 ||p.y> maxH ) break;\
+    }\
+    return clamp( res, 0.0, 1.0 );
+
+
 #ifdef DEFAULT_RENDER_SKY
 float3 RenderSky(float3 ro ,float3 rd,float3 lightDir){
 	fixed3 col = fixed3(0.0,0.0,0.0);  

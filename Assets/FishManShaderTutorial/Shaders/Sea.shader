@@ -75,7 +75,7 @@ Shader "FishManShaderTutorial/Sea" {
 				return col;
 			}
             float4 ProcessRayMarch(float2 uv,float3 ro,float3 rd,inout float sceneDep,float4 sceneCol){ 
-				float3 rz = RaycastTerrain(ro,rd); 
+				float rz = RaycastTerrain(ro,rd); 
 				float3 pos = ro + rd *rz;
 				float3 nor = NormalTerrian(pos.xz,rz);
                  

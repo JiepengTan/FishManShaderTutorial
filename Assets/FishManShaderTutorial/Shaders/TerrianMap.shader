@@ -1,6 +1,5 @@
 ﻿// create by JiepengTan 2018-04-12  email: jiepengtan@gmail.com
 // all right reserve
-// the base idea is come from https://www.shadertoy.com/view/ldfyzl
 Shader "FishManShaderTutorial/Ripple"
 {
     Properties
