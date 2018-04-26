@@ -11,14 +11,15 @@
 float TerrainL(float2 uv);
 float TerrainH(float2 uv);
 
-float3 NormalTerrian(float2 pos,float rz){
-	const float e = 0.00005*rz*rz;
-	float2 ex = float2(e, 0);
-	float H = TerrainH(pos.xy);
-	float3 a = float3(pos.x, H, pos.y);
-	return normalize(cross(normalize(a-float3(pos.x - e, TerrainH(pos.xy - ex.xy) , pos.y)), 
-							normalize(a-float3(pos.x, TerrainH(pos.xy + ex.yx) , pos.y + e))));
+
+float3 NormalTerrian( in float2 pos, float rz )
+{
+    float2  eps = float2( 0.002*rz, 0.0 );
+    return normalize( float3( TerrainH(pos-eps.xy) - TerrainH(pos+eps.xy),
+                            2.0*eps.x,
+                            TerrainH(pos-eps.yx) - TerrainH(pos+eps.yx) ) );
 }
+            
 
 float RaycastTerrain(float3 ro, float3 rd) {  
 	const float tmin = 0.1;
