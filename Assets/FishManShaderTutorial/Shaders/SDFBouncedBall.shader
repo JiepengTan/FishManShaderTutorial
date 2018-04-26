@@ -1,6 +1,6 @@
 ﻿// create by JiepengTan 2018-04-14 
 // email: jiepengtan@gmail.com
-Shader "FishManShaderTutorial/SDFBounceBall" {
+Shader "FishManShaderTutorial/SDFBouncedBall" {
     Properties{
         _MainTex("Base (RGB)", 2D) = "white" {}
     }
