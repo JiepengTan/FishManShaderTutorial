@@ -7,4 +7,6 @@
 
 #define ftime (_Time.y)
 
+#define _LightDir (_WorldSpaceLightPos0.xyz)	
+
 #endif // FMST_COMMOM

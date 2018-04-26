@@ -6,6 +6,9 @@
 #include "SDF.cginc"
 #include "Framework3D.cginc"
 
+//DEFAULT_RENDER                default render function
+//DEFAULT_MAT_COL               defualt material color function
+//DEFAULT_PROCESS_FRAG          default process frag function
 
 float3 MatCol(float matID,float3 pos,float3 nor);
 float2 Map( in float3 pos );

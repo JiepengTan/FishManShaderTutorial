@@ -6,7 +6,6 @@ Shader "FishManShaderTutorial/HighlandLake" {
 		_BaseWaterColor ("_BaseWaterColor", COLOR) = (.025, .2, .125,0.)
 		_LightWaterColor ("_LightWaterColor", COLOR) = (.025, .2, .125,0.)
 		waterHeight ("waterHeight", float) =1.0
-		//lightDir ("lightDir", Vector) =(-0.8,0.4,-0.3,0.)
 		SC ("SC", float) =15
 		waterTranDeep ("waterTranDeep", float) =5
     }
@@ -25,7 +24,6 @@ Shader "FishManShaderTutorial/HighlandLake" {
 			float waterTranDeep = 5;
 			
 			float waterHeight = 4.;
-			#define lightDir (_WorldSpaceLightPos0.xyz)
 			float SC = 15;
 
 			float WaterMap( fixed3 pos ) {
@@ -47,7 +45,7 @@ Shader "FishManShaderTutorial/HighlandLake" {
 
 			float3 RayMarchCloud(float3 ro,float3 rd){
 				fixed3 col = fixed3(0.0,0.0,0.0);  
-				float sundot = clamp(dot(rd,lightDir),0.0,1.0);
+				float sundot = clamp(dot(rd,_LightDir),0.0,1.0);
                
                  // sky      
                 col = float3(0.2,0.5,0.85)*1.1 - rd.y*rd.y*0.5;
@@ -123,7 +121,7 @@ Shader "FishManShaderTutorial/HighlandLake" {
 
                 float3 ref = reflect( rd, nor );
                 float fre = clamp( 1.0+dot(rd,nor), 0.0, 1.0 );
-                float3 hal = normalize(lightDir-rd);
+                float3 hal = normalize(_LightDir-rd);
         
                 // rock
                 float r = tex2D( _NoiseTex, (7.0/SC)*pos.xz/256.0 ).x;
@@ -133,12 +131,12 @@ Shader "FishManShaderTutorial/HighlandLake" {
 
                 // lighting     
                 float amb = clamp(0.5+0.5*nor.y,0.0,1.0);
-                float dif = clamp( dot( lightDir, nor ), 0.0, 1.0 );
-                float bac = clamp( 0.2 + 0.8*dot( normalize( float3(-lightDir.x, 0.0, lightDir.z ) ), nor ), 0.0, 1.0 );
+                float dif = clamp( dot( _LightDir, nor ), 0.0, 1.0 );
+                float bac = clamp( 0.2 + 0.8*dot( normalize( float3(-_LightDir.x, 0.0, _LightDir.z ) ), nor ), 0.0, 1.0 );
 
 				//shadow
                 float sh = .0; 
-                if( dif>=0.0001 ) sh = SoftShadow(pos+lightDir*SC*0.05,lightDir);
+                if( dif>=0.0001 ) sh = SoftShadow(pos+_LightDir*SC*0.05,_LightDir);
         
 				// 
                 float3 lin  = float3(0.0,0.0,0.0);
@@ -162,7 +160,7 @@ Shader "FishManShaderTutorial/HighlandLake" {
 					float t = -(ro.y - waterHeight)/rd.y;
 					waterT = min(waterT,t);
 				}
-				float sundot = clamp(dot(rd,lightDir),0.0,1.0);
+				float sundot = clamp(dot(rd,_LightDir),0.0,1.0);
 				float rz = InteresctTerrial(ro,rd,minT,maxT);
 				float firstInsertRZ = min(rz,waterT);
 				float fresnel = 0;
@@ -174,7 +172,7 @@ Shader "FishManShaderTutorial/HighlandLake" {
 					float3 nor = WaterNormal(waterPos,waterT);
 					float ndotr = dot(nor,-rd);
 					fresnel = pow(1.0-abs(ndotr),6.);//计算 
-					float3 diff = pow(dot(nor,lightDir) * 0.4 + 0.6,3.);
+					float3 diff = pow(dot(nor,_LightDir) * 0.4 + 0.6,3.);
 					// get the water col 
 					float3 waterCol = _BaseWaterColor + diff * _LightWaterColor * 0.12; 
 					float transPer = pow(1.0-clamp( rz - waterT,0,waterTranDeep)/waterTranDeep,3.);
@@ -194,11 +192,12 @@ Shader "FishManShaderTutorial/HighlandLake" {
 				}
 				if( reflected == true ) {
 					col = lerp(refractCol,col,fresnel);
-					float spec=  pow(max(dot(rd,lightDir),0.0),128.) * 3.;
+					float spec=  pow(max(dot(rd,_LightDir),0.0),128.) * 3.;
 					col += float3(spec,spec,spec);
 				}
 				
 				MergeUnityIntoRayMarching(firstInsertRZ,col,sceneDep,sceneCol); 
+				col = pow( col, float3(0.4545,0.4545,0.4545) );
                 sceneCol.xyz = col;
 
                 return sceneCol;

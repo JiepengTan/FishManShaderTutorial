@@ -4,7 +4,7 @@ Shader "FishManShaderTutorial/Sea" {
 		_LoopNum ("_LoopNum", Vector) = (314.,1., 1, 1)
 		_SeaBaseColor ("_SeaBaseColor", Color) = (0.1,0.19,0.22, 1) // color
 		_SeaWaterColor ("_SeaWaterColor", Color) = (0.8,0.9,0.6) // color
-		_SeaHeight ("_SeaHeight", float) = 5. // color
+		_SeaWaveHeight ("_SeaWaveHeight", float) = 5. // color
 		
     }
     SubShader{
@@ -12,116 +12,78 @@ Shader "FishManShaderTutorial/Sea" {
             ZTest Always Cull Off ZWrite Off
             CGPROGRAM
 
-
 #pragma vertex vert  
 #pragma fragment frag  
-#include "ShaderLibs/Framework3D.cginc"
+#define DEFAULT_RENDER_SKY
+#include "ShaderLibs/Framework3D_Terrain.cginc"
 
 			float3 _SeaBaseColor;
 			float3 _SeaWaterColor;
             float4 _LoopNum;
-			float _SeaHeight;
-			#define lightDir _WorldSpaceLightPos0 
-			
+			float _SeaWaveHeight;
 
-			float wave(float2 uv, float2 emitter, float speed, float phase){
+		#define	Waves(uv,NUM)\
+				float w = 0.0,sw = 0.0;\
+				float iter = 0.0, ww = 1.0;\
+				uv += ftime * 0.5;\
+				for(int i=0;i<NUM;i++){\
+					w += ww * Wave(uv * 0.06 , float2(sin(iter), cos(iter)) * 10.0, 2.0 + iter * 0.08, 2.0 + iter * 3.0);\
+					sw += ww;\
+					ww = lerp(ww, 0.0115, 0.4);\
+					iter += 2.39996;\
+				}\
+				return w / sw*_SeaWaveHeight;\
+
+				
+			float Wave(float2 uv, float2 emitter, float speed, float phase){ 
+				//uv += Noise(uv);
 				float dst = distance(uv, emitter);
-				return pow((0.5 + 0.5 * sin(dst * phase - time * speed)), 5.0);
+				return pow((0.5 + 0.5 * sin(dst * phase - ftime * speed)), 5.0);
 			}
-			float getwaves(float2 uv){
-				float w = 0.0;
-				float sw = 0.0;
-				float iter = 0.0;
-				float ww = 1.0;
-				uv += time * 0.5;
-				// it seems its absolutely fastest way for water height function that looks real
-				for(int i=0;i<5;i++){
-					w += ww * wave(uv * 0.06 , float2(sin(iter), cos(iter)) * 10.0, 2.0 + iter * 0.08, 2.0 + iter * 3.0);
-					sw += ww;
-					ww = lerp(ww, 0.0115, 0.4);
-					iter += 2.39996;
-				}
-				return w / sw;
+
+			float TerrainL(float2 uv){
+				Waves(uv,5);
 			}
-			float getwavesH(float2 uv){
-				float w = 0.0;
-				float sw = 0.0;
-				float iter = 0.0;
-				float ww = 1.0;
-				uv += time * 0.5;
-				// it seems its absolutely fastest way for water height function that looks real
-				for(int i=0;i<24;i++){
-					w += ww * wave(uv * 0.06 , float2(sin(iter), cos(iter)) * 10.0, 2.0 + iter * 0.08, 2.0 + iter * 3.0);
-					sw += ww;
-					ww = lerp(ww, 0.0115, 0.4);
-					iter += 2.39996;
-				}
-				return w / sw;
+			float TerrainH(float2 uv){
+				Waves(uv,24);
 			}
-	
-			float heightMapTracing(float3 ro, float3 rd) {  
-				float tmin = 0.1;
-				float tmax = 1000;
-				float t = tmin;
-				for( int i=0; i< 314; i++ )
-				{
-					float3 p = ro + t*rd;
-					float h = p.y - getwaves(p.xz)*_SeaHeight;
-					if( h<0.002 || t>tmax ) break;
-					t += 0.8*h;
-				}
-				return t;
-			}
-			
+#ifndef DEFAULT_RENDER_SKY
 			// sky
-			float3 getSkyColor(float3 e,float3 lightDir) {
-				e.y = max(e.y,0.0);
-				float3 col =  float3(pow(1.0-e.y,2.0), 1.0-e.y, 0.6+(1.0-e.y)*0.4);
-				float val = pow(max(dot(e,lightDir),0.0),200.0);
+			float3 RenderSky(float3 ro,float3 rd,float3 lightDir) {
+				rd.y = max(rd.y,0.0);
+				float3 col =  float3(pow(1.0-rd.y,2.0), 1.0-rd.y, 0.6+(1.0-rd.y)*0.4);
+				float val = pow(max(dot(rd,lightDir),0.0),200.0);
 				col += float3(val,val,val);
 				return col;
 			}
-        
-			float3 getSeaColor(float3 p, float3 n, float3 l, float3 eye, float3 dist) {  
-				float fresnel = clamp(1.0 - dot(n,-eye), 0.0, 1.0);
+#endif
+	
+			float3 RenderSea(float3 pos, float3 rd,float rz, float3 nor, float3 lightDir) {  
+				float fresnel = clamp(1.0 - dot(nor,-rd), 0.0, 1.0);
 				fresnel = pow(fresnel,3.0) * 0.65;
         
-				float3 reflected = getSkyColor(reflect(eye,n),l);    
-				float3 diff = pow(dot(n,l) * 0.4 + 0.6,3.);
-				float3 refracted = _SeaBaseColor + diff * _SeaWaterColor * 0.12; 
-    
+				float3 reflected = RenderSky(pos,reflect(rd,nor),lightDir);    
+				float3 diff = pow(dot(nor,lightDir) * 0.4 + 0.6,3.);
+				float3 refracted = _SeaBaseColor + diff * _SeaWaterColor * 0.12;
 				float3 col = lerp(refracted,reflected,fresnel);
     
-				float atten = max(1.0 - dot(dist,dist) * 0.001, 0.0);
+				float atten = max(1.0 - dot(rz,rz) * 0.001, 0.0);
 				//col += _SeaWaterColor * (p.y - _SeaHeight) * 0.18 * atten;
-
-				float nrm = (60. + 8.0) / (PI * 8.0);
-				float spec=  pow(max(dot(reflect(eye,n),l),0.0),60.) * nrm;
+				float spec=  pow(max(dot(reflect(rd,nor),lightDir),0.0),60.) * 3.;
 				col += float3(spec,spec,spec);
     
 				return col;
 			}
-			float3 calcnormal(float2 pos, float e){
-				float2 ex = float2(e, 0);
-				float H = getwavesH(pos.xy) * _SeaHeight;
-				float3 a = float3(pos.x, H, pos.y);
-				return normalize(cross(normalize(a-float3(pos.x - e, getwavesH(pos.xy - ex.xy) * _SeaHeight, pos.y)), 
-									   normalize(a-float3(pos.x, getwavesH(pos.xy + ex.yx) * _SeaHeight, pos.y + e))));
-			}
-
             float4 ProcessRayMarch(float2 uv,float3 ro,float3 rd,inout float sceneDep,float4 sceneCol){ 
-				float3 t = heightMapTracing(ro,rd);
-				float3 p = ro + t * rd;
-				float3 dist = p - ro;
-				float3 n = calcnormal(p.xz,0.0005);
-             
+				float3 rz = RaycastTerrain(ro,rd); 
+				float3 pos = ro + rd *rz;
+				float3 nor = NormalTerrian(pos.xz,rz);
+                 
 				// color
-				float3 col = lerp(
-					getSkyColor(rd,lightDir),
-					getSeaColor(p,n,lightDir,rd,dist),
-    				pow(smoothstep(0.0,-0.05,rd.y),0.3));
-				float val = p.y;
-                sceneCol.xyz = float3(val,val,val);
+				float3 skyCol = RenderSky(pos,rd,_LightDir);
+				float3 seaCol = RenderSea(pos,rd,rz,nor,_LightDir);
+				float3 col = lerp(skyCol,seaCol,pow(smoothstep(0.0,-0.05,rd.y),0.3));
+				col = pow( col, float3(0.4545,0.4545,0.4545) );
 				sceneCol.xyz = col;
                 return sceneCol; 
             }
@@ -130,6 +92,4 @@ Shader "FishManShaderTutorial/Sea" {
     }//end SubShader 
     FallBack Off
 }
-
-
 
