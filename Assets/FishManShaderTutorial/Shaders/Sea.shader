@@ -49,7 +49,7 @@ Shader "FishManShaderTutorial/Sea" {
 			}
 #ifndef DEFAULT_RENDER_SKY
 			// sky
-			float3 RenderSky(float3 ro,float3 rd,float3 lightDir) {
+			float3 RenderSky(float3 ro,float3 rd,float3 lightDir) { 
 				rd.y = max(rd.y,0.0);
 				float3 col =  float3(pow(1.0-rd.y,2.0), 1.0-rd.y, 0.6+(1.0-rd.y)*0.4);
 				float val = pow(max(dot(rd,lightDir),0.0),200.0);

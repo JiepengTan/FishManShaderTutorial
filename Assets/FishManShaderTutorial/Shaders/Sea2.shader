@@ -26,7 +26,7 @@ Shader "FishManShaderTutorial/Sea2" {
             CGPROGRAM
             float4 _LooPNUMS = float4(3.,5.,25., 1);
 // 是否使用Noise 贴图来加速
-//#define USING_TEXLOD_NOISE 
+#define USING_VALUE_NOISE 
 
 #define DEFAULT_RENDER_SKY
 #pragma vertex vert  

@@ -10,7 +10,6 @@ sampler2D _NoiseTex;
 	#define Noise PNoise
 #elif defined(USING_VALUE_NOISE) 
 	#define Noise VNoise
-	#undefine USING_TEXLOD_NOISE
 #elif defined(USING_SIMPLEX_NOISE) 
 	#define Noise SNoise
 #elif defined(USING_VNOISE) 
