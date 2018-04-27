@@ -175,8 +175,8 @@ float VNoise(float2 p)
     
     float2 w = pf * pf * (3.0 - 2.0 * pf);
     
-    return lerp(lerp(Hash21(pi + float2(0.0, 0.0)), Hash21(pi + float2(1.0, 0.0)), w.x),
-               lerp(Hash21(pi + float2(0.0, 1.0)), Hash21(pi + float2(1.0, 1.0)), w.x),
+    return lerp(lerp(Hash12(pi + float2(0.0, 0.0)), Hash12(pi + float2(1.0, 0.0)), w.x),
+               lerp(Hash12(pi + float2(0.0, 1.0)), Hash12(pi + float2(1.0, 1.0)), w.x),
                w.y);
 }
 
@@ -190,12 +190,12 @@ float VNoise(float3 p)
     
     return  lerp(
                 lerp(
-                    lerp(Hash31(pi + float3(0, 0, 0)), Hash31(pi + float3(1, 0, 0)), w.x),
-                    lerp(Hash31(pi + float3(0, 0, 1)), Hash31(pi + float3(1, 0, 1)), w.x), 
+                    lerp(Hash13(pi + float3(0, 0, 0)), Hash13(pi + float3(1, 0, 0)), w.x),
+                    lerp(Hash13(pi + float3(0, 0, 1)), Hash13(pi + float3(1, 0, 1)), w.x), 
                     w.z),
                 lerp(
-                    lerp(Hash31(pi + float3(0, 1, 0)), Hash31(pi + float3(1, 1, 0)), w.x),
-                    lerp(Hash31(pi + float3(0, 1, 1)), Hash31(pi + float3(1, 1, 1)), w.x), 
+                    lerp(Hash13(pi + float3(0, 1, 0)), Hash13(pi + float3(1, 1, 0)), w.x),
+                    lerp(Hash13(pi + float3(0, 1, 1)), Hash13(pi + float3(1, 1, 1)), w.x), 
                     w.z),
                 w.y);
 }

@@ -21,18 +21,16 @@ Shader "FishManShaderTutorial/Fog" {
 #pragma vertex vert  
 #pragma fragment frag  
 #include "ShaderLibs/Framework3D.cginc" 
-            // value Noise, and its analytical derivatives
-    				/*	*/
 			#define ITR 100 
-			#define FAR 200.
+			#define FAR 50.
 			
 
-			fixed3 normal(in fixed3 p)
+			fixed3 Normal(in fixed3 p)
 			{  
 				return float3(0.,1.0,0.);
 			}
 
-			fixed march(in fixed3 ro, in fixed3 rd)
+			fixed RayCast(in fixed3 ro, in fixed3 rd)
 			{
 				if (rd.y>=0.0) {
 					return 100000;
@@ -45,7 +43,7 @@ Shader "FishManShaderTutorial/Fog" {
 				fixed3 ligt = normalize( fixed3(.5, .05, -.2) );
 				fixed3 ligt2 = normalize( fixed3(.5, -.1, -.2) );
     
-				fixed rz = march(ro,rd);
+				fixed rz = RayCast(ro,rd);
 	
 				fixed3 fogb = lerp(fixed3(.7,.8,.8	)*0.3, fixed3(1.,1.,.77)*.95, pow(dot(rd,ligt2)+1.2, 2.5)*.25);
 				fogb *= clamp(rd.y*.5+.6, 0., 1.);
@@ -54,7 +52,7 @@ Shader "FishManShaderTutorial/Fog" {
 				if ( rz < FAR )
 				{
 					fixed3 pos = ro+rz*rd;
-					fixed3 nor= normal( pos );
+					fixed3 nor= Normal( pos );
 					fixed dif = clamp( dot( nor, ligt ), 0.0, 1.0 );
 					fixed spe = pow(clamp( dot( reflect(rd,nor), ligt ), 0.0, 1.0 ),50.);
 					col = lerp(fixed3(0.1,0.2,1),fixed3(.3,.5,1),pos.y*.5)*0.2+.1;

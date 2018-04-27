@@ -42,6 +42,17 @@ float FBMR( float2 p )
     f += 0.03125*Noise( p );
     return f/0.984375;
 }
+float FBMR( float3 p )
+{
+    float f = 0.0;
+
+    f += 0.50000*Noise( p ); p = mul(_m3,p)*2.02;
+    f += 0.25000*Noise( p ); p = mul(_m3,p)*2.03;
+    f += 0.12500*Noise( p ); p = mul(_m3,p)*2.01;
+    f += 0.06250*Noise( p ); p = mul(_m3,p)*2.04;
+    f += 0.03125*Noise( p );
+    return f/0.984375;
+}
 float FBMR( float2 p,float iterNum)
 {
     float f = 0.0;
