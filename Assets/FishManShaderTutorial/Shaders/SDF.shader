@@ -33,7 +33,7 @@ Shader "FishManShaderTutorial/SDF" {
             #define BridgeW 2.  
             #define BridgeH 4.
 
-            #define BridgeL1 50.
+            #define BridgeL1 50. 
 
 
             #define LegGap (BridgeW*0.45)
@@ -55,8 +55,8 @@ Shader "FishManShaderTutorial/SDF" {
 
   
             float SdBoatHull( float3 vPos )
-            {
-                vPos.y-=0.4;
+            { 
+                vPos.y-=0.4; 
                 float3 vBoatDomain = vPos;
                 vBoatDomain.x = abs(vBoatDomain.x);
                 

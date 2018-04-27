@@ -50,7 +50,7 @@ float3 Render( in float3 ro, in float3 rd )
     if( m>-0.5 )
     {
         float3 pos = ro + t*rd;
-        float3 nor = CalcNormal( pos );
+        float3 nor = CalcNormal( pos,0.01);
         float3 ref = reflect( rd, nor );
 		col = MatCol(m,pos,nor);
 
