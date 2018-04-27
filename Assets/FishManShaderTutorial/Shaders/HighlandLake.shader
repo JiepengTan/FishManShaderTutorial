@@ -16,7 +16,7 @@ Shader "FishManShaderTutorial/HighlandLake" {
             float4 _LoopNum = float4(40.,128.,0.,0.);
 #pragma vertex vert  
 #pragma fragment frag  
-#include "ShaderLibs/Framework3D.cginc" 
+#include "ShaderLibs/Framework3D_Terrain.cginc" 
 			
 			float3 _BaseWaterColor;
 			float3 _LightWaterColor;
@@ -43,81 +43,35 @@ Shader "FishManShaderTutorial/HighlandLake" {
 				return normalize( normal );	
 			}
 
-			float3 RayMarchCloud(float3 ro,float3 rd){
-				fixed3 col = fixed3(0.0,0.0,0.0);  
-				float sundot = clamp(dot(rd,_LightDir),0.0,1.0);
-               
-                 // sky      
-                col = float3(0.2,0.5,0.85)*1.1 - rd.y*rd.y*0.5;
-                col = lerp( col, 0.85*float3(0.7,0.75,0.85), pow( 1.0-max(rd.y,0.0), 4.0 ) );
-                // sun
-                col += 0.25*float3(1.0,0.7,0.4)*pow( sundot,5.0 );
-                col += 0.25*float3(1.0,0.8,0.6)*pow( sundot,64.0 );
-                col += 0.4*float3(1.0,0.8,0.6)*pow( sundot,512.0 );
-                // clouds
-				col = Cloud(col,ro,rd,float3(1.0,0.95,1.0),1,1);
-                // .
-                col = lerp( col, 0.68*float3(0.4,0.65,1.0), pow( 1.0-max(rd.y,0.0), 16.0 ) );
-				return col;
-			}
-			float TerrainHigh( in float2 x ) {
-				float2  p = x*0.003/SC;
-                float a = 0.0;
-                float b = 1.0;
-                float2  d = float2(0.0,0.0);
-                for( int i=0; i<9; i++ )
-                {
-                    float3 n = Noised(p);
-                    d += n.yz;
-                    a += b*n.x;
-                    b *= 0.5;
-                    p = p*2.0;
-                }
+			#define Terrain(pos,NUM)\
+                float2  p = pos.xz*0.003/SC;\
+                float a = 0.0;\
+                float b = 1.0;\
+                float2  d = float2(0.0,0.0);\
+                for( int i=0; i<NUM; i++ ){\
+                    float n = Noised(p).x;\
+                    a += b*n;\
+                    b *= 0.5;\
+                    p = p*2.0;\
+                }\
+				return float2(pos.y - SC*120.0*a,1.);
 
-                return SC*120.0*a;
-			}
-
-			float InteresctTerrial( in float3 ro, in float3 rd, in float tmin, in float tmax )
-            {
-                float t = tmin;
-                for( int i=0; i<218; i++ ) 
-                {
-                    float3 p = ro + t*rd;
-                    float h = p.y - TerrainHigh( p.xz );
-                    if( h<(0.002*t) || t>tmax ) break;
-                    t += 0.5*h;
-                } 
-                return t; 
-            }
-			float SoftShadow(in float3 ro, in float3 rd )
-            {
-                float res = 1.0;
-                float t = 0.001;
-                for( int i=0; i<80; i++ )
-                {
-                    float3  p = ro + t*rd;
-                    float h = p.y - TerrainHigh( p.xz );
-                    res = min( res, 16.0*h/t );
-                    t += h;
-                    if( res<0.001 ||p.y>(SC*200.0) ) break;
-                }
-                return clamp( res, 0.0, 1.0 );
-            }
+            float2 TerrainL(float3 pos){ 
+                Terrain(pos,9.);
+            } 
+            float2 TerrainM(float3 pos){
+                Terrain(pos,9.);
+            } 
+            float2 TerrainH(float3 pos){
+                Terrain(pos,9.);
+            }  
 
 
-
-            float3 CalcTerrianNormal( in float3 pos, float t )
-            {
-                float2  eps = float2( 0.002*t, 0.0 );
-                return normalize( float3( TerrainHigh(pos.xz-eps.xy) - TerrainHigh(pos.xz+eps.xy),
-                                        2.0*eps.x,
-                                        TerrainHigh(pos.xz-eps.yx) - TerrainHigh(pos.xz+eps.yx) ) );
-            }
 			
-			float3 RayMarchTerrial(float3 ro,float3 rd,float rz){
+			float3 RenderMountain(float3 ro,float3 rd,float rz){
 				float3 col = float3(0.,0.,0.);
 				float3 pos = ro + rz * rd;
-				float3 nor = CalcTerrianNormal(pos,rz);
+				float3 nor = NormalTerrian(pos,rz);
 
                 float3 ref = reflect( rd, nor );
                 float fre = clamp( 1.0+dot(rd,nor), 0.0, 1.0 );
@@ -136,7 +90,7 @@ Shader "FishManShaderTutorial/HighlandLake" {
 
 				//shadow
                 float sh = .0; 
-                if( dif>=0.0001 ) sh = SoftShadow(pos+_LightDir*SC*0.05,_LightDir);
+                if( dif>=0.0001 ) sh = SoftShadow(pos+_LightDir*SC*0.05,_LightDir,SC*200.0);
         
 				// 
                 float3 lin  = float3(0.0,0.0,0.0);
@@ -161,7 +115,7 @@ Shader "FishManShaderTutorial/HighlandLake" {
 					waterT = min(waterT,t);
 				}
 				float sundot = clamp(dot(rd,_LightDir),0.0,1.0);
-				float rz = InteresctTerrial(ro,rd,minT,maxT);
+				float rz = RaycastTerrain(ro,rd);
 				float firstInsertRZ = min(rz,waterT);
 				float fresnel = 0;
 				float3 refractCol = float3(0.,0.,0.);
@@ -171,24 +125,25 @@ Shader "FishManShaderTutorial/HighlandLake" {
 					float3 waterPos = ro + rd * waterT; 
 					float3 nor = WaterNormal(waterPos,waterT);
 					float ndotr = dot(nor,-rd);
-					fresnel = pow(1.0-abs(ndotr),6.);//计算 
+					fresnel = pow(1.0-abs(ndotr),6.);//计算  
 					float3 diff = pow(dot(nor,_LightDir) * 0.4 + 0.6,3.);
 					// get the water col 
 					float3 waterCol = _BaseWaterColor + diff * _LightWaterColor * 0.12; 
 					float transPer = pow(1.0-clamp( rz - waterT,0,waterTranDeep)/waterTranDeep,3.);
-					float3 bgCol = RayMarchTerrial(ro,rd + nor* clamp(1.-dot(rd,-nor),0.,1.),rz);
+					// get refract bg col
+					float3 bgCol = RenderMountain(ro,rd + nor* clamp(1.-dot(rd,-nor),0.,1.),rz);
 					refractCol = lerp(waterCol,bgCol,transPer);
 
 					ro = waterPos;
 					rd = reflect( rd, nor);
-					rz = InteresctTerrial(ro,rd,minT,maxT);
+					rz = RaycastTerrain(ro,rd);
 					reflected = true;
-					col = refractCol;
+					col = refractCol; 
 				}
 				if(rz >= maxT){
-					col = RayMarchCloud( ro, rd);
+					col = Sky( ro, rd,_LightDir);
 				}else{
-					col = RayMarchTerrial(ro,rd,rz);
+					col = RenderMountain(ro,rd,rz);
 				}
 				if( reflected == true ) {
 					col = lerp(refractCol,col,fresnel);
@@ -197,7 +152,6 @@ Shader "FishManShaderTutorial/HighlandLake" {
 				}
 				
 				MergeUnityIntoRayMarching(firstInsertRZ,col,sceneDep,sceneCol); 
-				col = pow( col, float3(0.4545,0.4545,0.4545) );
                 sceneCol.xyz = col;
 
                 return sceneCol;

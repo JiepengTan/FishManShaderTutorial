@@ -54,23 +54,21 @@ float PNoise( in float3 p )
 }
 
 
-#ifdef USING_TEXLOD_NOISE
-float3 Noised( in float2 x )
-{
-    float2 f = frac(x);
-    float2 u = f*f*(3.0-2.0*f);
-
-    // tex2D version    
-    float2 p = floor(x);
-    float a = tex2Dlod( _NoiseTex,float4( (p+float2(0.5,0.5))/256.0, 0.0 ,0.0)).x;
-    float b = tex2Dlod( _NoiseTex,float4( (p+float2(1.5,0.5))/256.0, 0.0 ,0.0)).x;
-    float c = tex2Dlod( _NoiseTex,float4( (p+float2(0.5,1.5))/256.0, 0.0 ,0.0)).x;
-    float d = tex2Dlod( _NoiseTex,float4( (p+float2(1.5,1.5))/256.0, 0.0 ,0.0)).x;
-    
-    return float3(a+(b-a)*u.x+(c-a)*u.y+(a-b-c+d)*u.x*u.y,
-                6.0*f*(1.0-f)*(float2(b-a,c-a)+(a-b-c+d)*u.yx));
-}
-#else  
+//float3 Noised( in float2 x )
+//{
+//    float2 f = frac(x);
+//    float2 u = f*f*(3.0-2.0*f);
+//
+//    // tex2D version    
+//    float2 p = floor(x);
+//    float a = tex2Dlod( _NoiseTex,float4( (p+float2(0.5,0.5))/256.0, 0.0 ,0.0)).x;
+//    float b = tex2Dlod( _NoiseTex,float4( (p+float2(1.5,0.5))/256.0, 0.0 ,0.0)).x;
+//    float c = tex2Dlod( _NoiseTex,float4( (p+float2(0.5,1.5))/256.0, 0.0 ,0.0)).x;
+//    float d = tex2Dlod( _NoiseTex,float4( (p+float2(1.5,1.5))/256.0, 0.0 ,0.0)).x;
+//    
+//    return float3(a+(b-a)*u.x+(c-a)*u.y+(a-b-c+d)*u.x*u.y,
+//                6.0*f*(1.0-f)*(float2(b-a,c-a)+(a-b-c+d)*u.yx));
+//}
 // 带导数的Noise的推导请参考Milo的 https://stackoverflow.com/questions/4297024/3d-perlin-Noise-analytical-derivative
 float3 Noised( in float2 p )
 {
@@ -101,7 +99,6 @@ float3 Noised( in float2 p )
                  ga + u.x*(gb-ga) + u.y*(gc-ga) + u.x*u.y*(ga-gb-gc+gd) +  // derivatives
                  du * (u.yx*(va-vb-vc+vd) + float2(vb,vc) - va));
 }
-#endif
 
 // return value Noise (in x) and its derivatives (in yzw)
 float4 Noised( in float3 x )

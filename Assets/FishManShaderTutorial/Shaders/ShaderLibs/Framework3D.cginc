@@ -108,7 +108,7 @@ float4 frag(v2f i) : SV_Target{
         float precis = 0.0005*t;\
         float2 res = MAP_FUNC( ro+rd*t );\
         if( res.x<precis || t>tmax ) break;\
-        t += 0.8*res.x;\
+        t += 0.5*res.x;\
         m = res.y;\
     } \
     if( t>tmax ) m=-1.0;\

@@ -39,12 +39,12 @@ Shader "FishManShaderTutorial/Lake" {
 			}
 
 			float3 WaterNormal(float3 pos,float rz){
-				float EPSILON = 0.01;
+				float EPSILON = 0.001 * rz;
 				float3 dx = float3( EPSILON, 0.,0. );
 				float3 dz = float3( 0.,0., EPSILON );
 					
 				float3	normal = float3( 0., 1., 0. );
-				float bumpfactor = 0.2 * (1. - smoothstep( 0., 500, rz) );//根据距离所见Bump幅度
+				float bumpfactor = 0.2 * (1. - smoothstep( 0., 1000, rz) );//根据距离所见Bump幅度
 				
 				normal.x = -bumpfactor * (WaterMap(pos + dx) - WaterMap(pos-dx) ) / (2. * EPSILON);
 				normal.z = -bumpfactor * (WaterMap(pos + dz) - WaterMap(pos-dz) ) / (2. * EPSILON);
@@ -52,26 +52,8 @@ Shader "FishManShaderTutorial/Lake" {
 			}
 
 
-			float3 RayMarchCloud(float3 ro,float3 rd){
-				fixed3 col = fixed3(0.0,0.0,0.0);  
-				float sundot = clamp(dot(rd,lightDir),0.0,1.0);
-               
-                 // sky      
-                col = float3(0.2,0.5,0.85)*1.1 - rd.y*rd.y*0.5;
-                col = lerp( col, 0.85*float3(0.7,0.75,0.85), pow( 1.0-max(rd.y,0.0), 4.0 ) );
-                // sun
-                col += 0.25*float3(1.0,0.7,0.4)*pow( sundot,5.0 );
-                col += 0.25*float3(1.0,0.8,0.6)*pow( sundot,64.0 );
-                col += 0.2*float3(1.0,0.8,0.6)*pow( sundot,512.0 );
-                // clouds
-				col = Cloud(col,ro,rd,float3(1.0,0.95,1.0),1,1);
-                // .
-                col = lerp( col, 0.68*float3(0.4,0.65,1.0), pow( 1.0-max(rd.y,0.0), 16.0 ) );
-				return col;
-			}
-
             float4 ProcessRayMarch(float2 uv,float3 ro,float3 rd,inout float sceneDep,float4 sceneCol){ 
-				fixed3 col = RayMarchCloud(ro,rd);
+				fixed3 col = Sky(ro,rd,lightDir);
 				if(rd.y < -0.01 ) { 
 					float rz = (-ro.y)/rd.y;
 					float3 pos = ro + rd * rz; 
@@ -79,7 +61,7 @@ Shader "FishManShaderTutorial/Lake" {
 					float ndotr = dot(normal,-rd);
 					float fresnel = pow(1.0-abs(ndotr),6.);//计算 
 					float3 reflectRd = reflect( rd, normal);
-					float3 reflectCol = RayMarchCloud( ro, reflectRd);
+					float3 reflectCol = Sky( ro, reflectRd,lightDir);
   
 					float3 diff = pow(dot(normal,lightDir) * 0.4 + 0.6,3.);
 					float3 refractCol = _BaseWaterColor + diff * _LightWaterColor * 0.12; 
