@@ -151,6 +151,47 @@ fixed CheckersGradBox( in fixed2 p )
     return 0.5 - 0.5*i.x*i.y;                  
 }
 
+
+float _Ripple(float period,float spreadSpd,float waveGap,float2 uv,float rnd){
+	 // sample the texture
+	const float WAVE_NUM = 2.;
+    const float  CROSS_NUM = 1.0;
+    float ww = -WAVE_NUM * .5 * waveGap;
+    float hww = ww * 0.5;
+    float freq = WAVE_NUM * PI2 / waveGap/(CROSS_NUM + 1.);
+    float radius = (float(CROSS_NUM));
+    float2 p0 = floor(uv);
+    float sum = 0.;
+
+    for (float j = -CROSS_NUM; j <= CROSS_NUM; ++j){
+        for (float i = -CROSS_NUM; i <= CROSS_NUM; ++i){
+            float2 pi = p0 + float2(i, j);
+            float2 h22 = Hash23(float3(pi,rnd));
+            float h12 = Hash13(float3(pi,rnd));
+            float pd = period*( h12 * 1.+ 1.);
+            float time = ftime+pd*h12;
+            float t = fmod(time,pd);
+			float spd = spreadSpd*((1.0-h12) * 0.2 + 0.8);
+            float size = (h12)*0.4+0.6;
+            float maxt = min(pd*0.6,radius *size /spd);
+            float amp = clamp01(1.- t/maxt);
+            float2 p = pi +  Hash21(h12 + floor(time/pd)) * 0.4;
+            float d = (length(p - uv) - spd*t)/radius * 0.5;
+            sum -= amp*sin(freq*d) *  smoothstep(ww*size, hww*size, d) *  smoothstep(0., hww*size, d);
+        }
+    }
+    sum /= (CROSS_NUM*2+1)*(CROSS_NUM*2+1);
+    return sum;
+}
+
+float Ripples(float2 uv ,float layerNum,float tileNum,float period,float spreadSpd,float waveGap){
+	float sum = 0.;
+	for(int i =0;i<layerNum;i++){
+		sum += _Ripple(period,spreadSpd,waveGap,uv*(1.+i/layerNum ) * tileNum,float(i));
+	}
+	return sum ;
+}
+
 #define Caustic CausticRotateMin
 
 #endif // FMST_NOISE
