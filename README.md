@@ -1,3 +1,17 @@
+---
+layout: post
+title:  "中级Shader教程00 总纲"
+date:   2018-03-26 16:09:03
+author: Jiepeng Tan
+categories: 
+ - shader tutorial
+tags: shader_tutorial
+img_path: /assets/img/blog/ShaderTutorial2D/Snow
+mathjax: true
+---
+
+
+
 # FishMan Shader Tutorial
 
 ### **0.说在前面**
@@ -38,7 +52,7 @@
     - [雪花][8]
     - [火焰粒子][9]
     - [熔岩][10]
-    - 下雨
+    - [下雨][28]
  2. **3D Shader**
     - [Unity 和 Raymarch 整合][11]
     - [星空][16]
@@ -103,36 +117,36 @@
 - 如果想学习哪种类型的shader，可以在[这里][1]留言,我优先出留言中的shader的教程
 
 
+
   [1]: https://blog.csdn.net/tjw02241035621611/article/details/80038608
   [2]: https://github.com/JiepengTan/FishManShaderTutorial
   [3]: https://github.com/JiepengTan/Unity-Raymarching-Framework
-  [4]: https://jiepengtan.github.io/2018/03/27/shader-tutorial01-base-math/
-  [5]: https://jiepengtan.github.io/2018/03/27/shader-tutorial02-shader-skills/
-  [6]: https://jiepengtan.github.io/2018/03/27/shader-tutorial03-2D-shader-framework/
-  [7]: https://jiepengtan.github.io/2018/03/27/shader-tutorial04-2D-sea/
-  [8]: https://jiepengtan.github.io/2018/03/27/shader-tutorial05-2D-snow/
-  [9]: https://jiepengtan.github.io/2018/03/27/shader-tutorial06-2D-fire-particle/
-  [10]: https://jiepengtan.github.io/2018/03/27/shader-tutorial07-2D-lava/
-  [11]: https://jiepengtan.github.io/2018/04/22/shader-tutorial09-1-raymarch-framework/
-  [12]: https://jiepengtan.github.io/2018/04/23/shader-tutorial10-SDF/
-  [13]: https://jiepengtan.github.io/2018/04/23/shader-tutorial10-SDF/
-  [14]: https://jiepengtan.github.io/2018/04/23/shader-tutorial11-default-renderframe/
-  [15]: https://jiepengtan.github.io/2018/04/23/shader-tutorial12-bounced-balls/
-  [16]: https://jiepengtan.github.io/2018/04/23/shader-tutorial13-stars/
-  [17]: https://jiepengtan.github.io/2018/04/23/shader-tutorial14-sky/
-  [18]: https://jiepengtan.github.io/2018/04/23/shader-tutorial15-mountain/
-  [19]: https://jiepengtan.github.io/2018/04/23/shader-tutorial16-lake/
-  [20]: https://jiepengtan.github.io/2018/04/23/shader-tutorial17-sea/
-  [21]: https://jiepengtan.github.io/2018/04/23/shader-tutorial18-mutil_transparent_render/
-  [22]: https://jiepengtan.github.io/2018/04/23/shader-tutorial19-fog/
-  [23]: https://jiepengtan.github.io/2018/04/23/shader-tutorial20-cloud/
-  [24]: https://jiepengtan.github.io/2018/04/25/shader-tutorial21-shader-tips-compute/
+  [4]: https://blog.csdn.net/tjw02241035621611/article/details/80041397
+  [5]: https://blog.csdn.net/tjw02241035621611/article/details/80043469
+  [6]: https://blog.csdn.net/tjw02241035621611/article/details/80042647
+  [7]: https://blog.csdn.net/tjw02241035621611/article/details/80042736
+  [8]: https://blog.csdn.net/tjw02241035621611/article/details/80047566
+  [9]: https://blog.csdn.net/tjw02241035621611/article/details/80045381
+  [10]: https://blog.csdn.net/tjw02241035621611/article/details/80048713
+  [11]: https://blog.csdn.net/tjw02241035621611/article/details/80057928
+  [12]: https://blog.csdn.net/tjw02241035621611/article/details/80061750
+  [13]: https://blog.csdn.net/tjw02241035621611/article/details/80061750
+  [14]: https://blog.csdn.net/tjw02241035621611/article/details/80089786
+  [15]: https://blog.csdn.net/tjw02241035621611/article/details/80089804
+  [16]: https://blog.csdn.net/tjw02241035621611/article/details/80089822
+  [17]: https://blog.csdn.net/tjw02241035621611/article/details/80089850
+  [18]: https://blog.csdn.net/tjw02241035621611/article/details/80106320
+  [19]: https://blog.csdn.net/tjw02241035621611/article/details/80108319
+  [20]: https://blog.csdn.net/tjw02241035621611/article/details/80106327
+  [21]: https://blog.csdn.net/tjw02241035621611/article/details/80089882
+  [22]: https://blog.csdn.net/tjw02241035621611/article/details/80108619
+  [23]: https://blog.csdn.net/tjw02241035621611/article/details/80112668
+  [24]: https://blog.csdn.net/tjw02241035621611/article/details/80090204
   [25]: https://www.shadertoy.com/user/FishMan
-  [26]: https://jiepengtan.github.io/ 
-  [27]: https://jiepengtan.github.io/2018/04/26/shader-tutorial23-voronoi/
-  [28]: https://jiepengtan.github.io/2018/04/26/shader-tutorial24-water01-rain/
-  [29]: https://jiepengtan.github.io/2018/04/26/shader-tutorial25-water02-ripple/
-  [30]: https://jiepengtan.github.io/2018/04/26/shader-tutorial26-water03-caustic/
-  [31]: https://jiepengtan.github.io/2018/04/26/shader-tutorial27-water04-rain_on_window/
-  [32]: https://jiepengtan.github.io/2018/04/26/shader-tutorial27-water04-rain_on_window/
- 
+  [26]: https://jiepengtan.github.io/
+  [27]: https://blog.csdn.net/tjw02241035621611/article/details/80137615
+  [28]: https://blog.csdn.net/tjw02241035621611/article/details/80135576
+  [29]: https://blog.csdn.net/tjw02241035621611/article/details/80135597
+  [30]: https://blog.csdn.net/tjw02241035621611/article/details/80135626
+  [31]: https://blog.csdn.net/tjw02241035621611/article/details/80135648
+  [32]: https://blog.csdn.net/tjw02241035621611/article/details/80137622
