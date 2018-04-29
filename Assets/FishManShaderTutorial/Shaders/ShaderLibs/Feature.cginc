@@ -1,4 +1,5 @@
 // Create  by JiepengTan@gmail.com
+// https://github.com/JiepengTan/FishManShaderTutorial
 // 2018-03-27
 #ifndef FMST_FEATURE
 #define FMST_FEATURE

@@ -1,4 +1,5 @@
 // Create  by JiepengTan@gmail.com
+// https://github.com/JiepengTan/FishManShaderTutorial
 // 2018-04-24
 #ifndef FRAMEWORK_3D_DEFAULT_SCENE
 #define FRAMEWORK_3D_DEFAULT_SCENE

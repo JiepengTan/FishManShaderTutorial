@@ -1,4 +1,5 @@
-﻿// create by JiepengTan 2018-04-13  
+﻿// create by JiepengTan 
+// https://github.com/JiepengTan/FishManShaderTutorial
 // email: jiepengtan@gmail.com
 Shader "FishManShaderTutorial/SDF" {
     Properties{

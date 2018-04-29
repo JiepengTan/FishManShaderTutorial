@@ -1,4 +1,6 @@
-// create by JiepengTan  email: jiepengtan@gmail.com
+// create by JiepengTan 
+// https://github.com/JiepengTan/FishManShaderTutorial 
+// email: jiepengtan@gmail.com
 // 2018-04-13
 
 

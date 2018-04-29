@@ -1,4 +1,6 @@
-﻿// create by JiepengTan 2018-04-12  email: jiepengtan@gmail.com
+﻿// create by JiepengTan 
+// https://github.com/JiepengTan/FishManShaderTutorial
+// 2018-04-12  email: jiepengtan@gmail.com
 // all right reserve
 Shader "FishManShaderTutorial/Ripple"
 {

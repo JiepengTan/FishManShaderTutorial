@@ -1,4 +1,6 @@
-﻿// create by JiepengTan 2018-04-13  email: jiepengtan@gmail.com
+﻿// create by JiepengTan 
+// https://github.com/JiepengTan/FishManShaderTutorial
+// 2018-04-13  email: jiepengtan@gmail.com
 Shader "FishManShaderTutorial/Stars" {
     Properties{
         _MainTex("Base (RGB)", 2D) = "white" {}

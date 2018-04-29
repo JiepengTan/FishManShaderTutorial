@@ -1,4 +1,5 @@
-// Merge by JiepengTan@gmail.com
+// Merge  by JiepengTan@gmail.com
+// https://github.com/JiepengTan/FishManShaderTutorial
 // 2018-03-27
 #ifndef FMST_HASH
 #define FMST_HASH

@@ -1,4 +1,5 @@
 // Create  by JiepengTan@gmail.com
+// https://github.com/JiepengTan/FishManShaderTutorial
 // 2018-03-27
 #ifndef FRAMEWORK_3D
 #define FRAMEWORK_3D

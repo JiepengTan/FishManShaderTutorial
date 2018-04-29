@@ -1,4 +1,5 @@
 // create by JiepengTan 
+// https://github.com/JiepengTan/FishManShaderTutorial
 // date: 2018-03-27  
 // email: jiepengtan@gmail.com
 Shader "FishManShaderTutorial/2DSnow"{

@@ -1,4 +1,5 @@
 ﻿// create by JiepengTan 
+// https://github.com/JiepengTan/FishManShaderTutorial
 // date:2018-04-12 
 // email: jiepengtan@gmail.com
 Shader "FishManShaderTutorial/RayMarchSimpleScene"

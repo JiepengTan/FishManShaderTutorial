@@ -1,4 +1,8 @@
-﻿Shader "FishManShaderTutorial/Caustic_RotateMin"{
+﻿// create by JiepengTan 
+// https://github.com/JiepengTan/FishManShaderTutorial
+// date: 2018-03-27  
+// email: jiepengtan@gmail.com
+Shader "FishManShaderTutorial/Caustic_RotateMin"{
 	Properties{
         _MainTex ("Texture", 2D) = "white" {}
         _TileNum ("TileNum", float) = 1

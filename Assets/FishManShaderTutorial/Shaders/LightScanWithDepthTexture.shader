@@ -1,4 +1,7 @@
-﻿Shader "Unity Shaders Book/Chapter 13/Fog With Depth Texture" {
+﻿// create by JiepengTan 
+// https://github.com/JiepengTan/FishManShaderTutorial
+// 2018-04-13  email: jiepengtan@gmail.com
+Shader "Unity Shaders Book/Chapter 13/Fog With Depth Texture" {
 	Properties {
 		_MainTex ("Base (RGB)", 2D) = "white" {}
 		_SrcCenterPos("_SrcCenterPos", Vector) = (1, 1, 1, 1)

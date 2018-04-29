@@ -1,4 +1,5 @@
 ﻿// create by JiepengTan 
+// https://github.com/JiepengTan/FishManShaderTutorial
 // date: 2018-04-11 
 // email: jiepengtan@gmail.com
 Shader "FishManShaderTutorial/Caustic_TriTwist"{
