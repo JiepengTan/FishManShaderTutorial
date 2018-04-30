@@ -12,6 +12,7 @@ Shader "FishManShaderTutorial/Mountain" {
             ZTest Always Cull Off ZWrite Off
             CGPROGRAM
 
+#define USING_VALUE_NOISE 1
 #pragma vertex vert  
 #pragma fragment frag  
 #include "ShaderLibs/Framework3D_Terrain.cginc"
@@ -23,7 +24,7 @@ Shader "FishManShaderTutorial/Mountain" {
                 float b = 0.491;\
 				float2  d = float2(0.0,0.);\
                 for( int i=0; i<NUM; i++ ){\
-                    float n = Noised(p).x;\
+                    float n = VNoise(p);\
                     a += b*n;\
                     b *= 0.49;\
                     p = p*2.01;\
