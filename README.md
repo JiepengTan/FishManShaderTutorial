@@ -15,7 +15,6 @@ mathjax: true
 # FishMan Shader Tutorial
 
 ### **0.说在前面**
-如果你觉得本教程有用，就去[github][1]中给我颗星星⭐吧.
 
 - [本教程配套blog ][1]  
 - [本教程配套项目源码 ][2]  
