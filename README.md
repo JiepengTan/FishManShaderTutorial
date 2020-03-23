@@ -14,9 +14,10 @@ mathjax: true
 
 # FishMan Shader Tutorial
 
+## [**配套视频**][2]  
+
 ### **0.说在前面**
 
-- [**配套视频**][2]  
 - [本教程配套blog ][1]  
 - [教程中抽取的RayMarching框架][3]  
 - [本人shadertoy地址 ][25]  
